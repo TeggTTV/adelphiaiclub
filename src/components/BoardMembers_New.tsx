@@ -8,68 +8,58 @@ import ParticleConnections from './bits/ParticleConnection';
 import Particles from './bits/Particles';
 import { useState, useEffect } from 'react';
 
-const AvatarSVG = ({ initial, context = 'default' }: { initial: string; context?: string }) => {
-	const gradientId = `gradient-${initial}-${context}-${Math.random().toString(36).substr(2, 9)}`;
-	
-	return (
-		<svg
-			viewBox="0 0 100 100"
-			className="w-full h-full"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<defs>
-				<linearGradient
-					id={gradientId}
-					x1="0%"
-					y1="0%"
-					x2="100%"
-					y2="100%"
-				>
-					<stop offset="0%" stopColor="#3B82F6" />
-					<stop offset="100%" stopColor="#9333EA" />
-				</linearGradient>
-			</defs>
-			<circle
-				cx="50"
-				cy="50"
-				r="50"
-				fill={`url(#${gradientId})`}
-				className="drop-shadow-lg"
-			/>
-			<text
-				x="50"
-				y="50"
-				textAnchor="middle"
-				dominantBaseline="middle"
-				fontSize="40"
-				fontWeight="bold"
-				fill="white"
-				className="select-none font-sans"
+const AvatarSVG = ({ initial }: { initial: string }) => (
+	<svg
+		viewBox="0 0 100 100"
+		className="w-full h-full"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<defs>
+			<linearGradient
+				id={`gradient-${initial}`}
+				x1="0%"
+				y1="0%"
+				x2="100%"
+				y2="100%"
 			>
-				{initial}
-			</text>
-		</svg>
-	);
-};
+				<stop offset="0%" stopColor="#3B82F6" />
+				<stop offset="100%" stopColor="#9333EA" />
+			</linearGradient>
+		</defs>
+		<circle
+			cx="50"
+			cy="50"
+			r="50"
+			fill={`url(#gradient-${initial})`}
+			className="drop-shadow-lg"
+		/>
+		<text
+			x="50"
+			y="50"
+			textAnchor="middle"
+			dominantBaseline="middle"
+			fontSize="40"
+			fontWeight="bold"
+			fill="white"
+			className="select-none font-sans"
+		>
+			{initial}
+		</text>
+	</svg>
+);
 
 const boardMembers = [
 	{
-		name: 'Santiago Rodriguez',
+		name: 'Daniel Rowe',
 		role: 'President',
 		description:
-			'Artificial Intelligence major dedicated to improving lives through AI awareness and education. Leading initiatives to help students and faculty harness the power of AI tools.',
+			'Computer Science major passionate about machine learning and neural networks. Leading our club toward innovative AI solutions.',
 	},
-  {
-    name: 'Doryan Bendezu',
-    role: 'Vice President',
-    description:
-      'Nursing major bringing healthcare perspective to AI applications. Focused on bridging the gap between medical care and artificial intelligence.',
-  },
 	{
-		name: 'Joseph Jazwinski',
-		role: 'Senior Software Engineer',
+		name: 'Christopher Rogan',
+		role: 'Vice President',
 		description:
-			'Computer Science major with 7+ years of coding experience, specializing in TypeScript web development and backend systems',
+			'Mathematics and Computer Science double major focused on data science and algorithmic problem solving.',
 	},
 	{
 		name: 'Michael Riccio',
@@ -88,14 +78,12 @@ const boardMembers = [
 const BoardMembers = () => {
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [autoPlay, setAutoPlay] = useState(true);
-	const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
 
 	// Auto-play functionality
 	useEffect(() => {
 		if (!autoPlay) return;
 		
 		const interval = setInterval(() => {
-			setDirection(1);
 			setCurrentIndex((prev) => (prev + 1) % boardMembers.length);
 		}, 4000);
 
@@ -103,19 +91,16 @@ const BoardMembers = () => {
 	}, [autoPlay]);
 
 	const nextMember = () => {
-		setDirection(1);
 		setCurrentIndex((prev) => (prev + 1) % boardMembers.length);
 		setAutoPlay(false);
 	};
 
 	const prevMember = () => {
-		setDirection(-1);
 		setCurrentIndex((prev) => (prev - 1 + boardMembers.length) % boardMembers.length);
 		setAutoPlay(false);
 	};
 
 	const goToMember = (index: number) => {
-		setDirection(index > currentIndex ? 1 : -1);
 		setCurrentIndex(index);
 		setAutoPlay(false);
 	};
@@ -165,21 +150,18 @@ const BoardMembers = () => {
 					The brilliant minds driving innovation and fostering AI education at Adelphi University
 				</motion.p>
 
-				{/* Mobile Carousel (hidden on lg+) */}
-				<div className="lg:hidden relative max-w-4xl mx-auto">
+				{/* Carousel Container */}
+				<div className="relative max-w-4xl mx-auto">
 					{/* Main Featured Card */}
-					<div className="relative h-[400px] sm:h-[450px] flex items-center justify-center mb-8 overflow-hidden">
+					<div className="relative h-[400px] sm:h-[450px] flex items-center justify-center mb-8">
 						<AnimatePresence mode="wait">
 							<motion.div
 								key={currentIndex}
-								initial={{ opacity: 0, x: direction > 0 ? 300 : -300 }}
-								animate={{ opacity: 1, x: 0 }}
-								exit={{ opacity: 0, x: direction > 0 ? -300 : 300 }}
-								transition={{ 
-									duration: 0.5, 
-									ease: [0.25, 0.46, 0.45, 0.94]
-								}}
-								className="w-full max-w-md absolute"
+								initial={{ opacity: 0, scale: 0.8, rotateY: -90 }}
+								animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+								exit={{ opacity: 0, scale: 0.8, rotateY: 90 }}
+								transition={{ duration: 0.6, ease: "easeInOut" }}
+								className="w-full max-w-md"
 							>
 								<div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-white/20 relative shadow-2xl group">
 									{/* Enhanced Glow Effect */}
@@ -213,7 +195,7 @@ const BoardMembers = () => {
 													transition: { duration: 0.3 }
 												}}
 											>
-												<AvatarSVG initial={boardMembers[currentIndex].name[0]} context="carousel" />
+												<AvatarSVG initial={boardMembers[currentIndex].name[0]} />
 											</motion.div>
 										</motion.div>
 
@@ -298,6 +280,36 @@ const BoardMembers = () => {
 						))}
 					</div>
 
+					{/* Mini Preview Cards */}
+					<div className="hidden lg:flex justify-center space-x-4 mt-8 opacity-60">
+						{boardMembers.map((member, index) => {
+							if (index === currentIndex) return null;
+							const offset = index < currentIndex ? index - currentIndex : index - currentIndex;
+							const isVisible = Math.abs(offset) <= 2;
+							
+							if (!isVisible) return null;
+
+							return (
+								<motion.button
+									key={member.name}
+									onClick={() => goToMember(index)}
+									className="bg-white/5 backdrop-blur-sm rounded-xl p-3 border border-white/10 hover:bg-white/10 transition-all duration-300 flex flex-col items-center space-y-2 min-w-[120px]"
+									initial={{ opacity: 0, scale: 0.8 }}
+									animate={{ opacity: 1, scale: 0.8 }}
+									whileHover={{ scale: 0.85, opacity: 1 }}
+								>
+									<div className="w-12 h-12 overflow-hidden rounded-full">
+										<AvatarSVG initial={member.name[0]} />
+									</div>
+									<div className="text-center">
+										<p className="text-white text-xs font-medium">{member.name.split(' ')[0]}</p>
+										<p className="text-blue-400 text-xs">{member.role}</p>
+									</div>
+								</motion.button>
+							);
+						})}
+					</div>
+
 					{/* Auto-play Indicator */}
 					{autoPlay && (
 						<div className="absolute top-0 right-0 bg-green-500/20 backdrop-blur-sm rounded-full px-3 py-1 border border-green-500/30">
@@ -308,99 +320,6 @@ const BoardMembers = () => {
 						</div>
 					)}
 				</div>
-
-				{/* Desktop Grid (hidden on mobile/tablet) */}
-				<motion.div 
-					className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-6 xl:gap-8"
-					initial="hidden"
-					whileInView="visible"
-					viewport={{ once: true, amount: 0.1 }}
-					variants={{
-						hidden: { opacity: 0 },
-						visible: {
-							opacity: 1,
-							transition: {
-								staggerChildren: 0.15,
-								delayChildren: 0.1
-							}
-						}
-					}}
-				>
-					{boardMembers.map((member, index) => (
-						<motion.div
-							key={member.name}
-							className="bg-white/5 backdrop-blur-md rounded-xl p-6 xl:p-8 2xl:p-10 border border-white/10 shadow-lg hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group flex flex-col"
-							variants={{
-								hidden: { 
-									opacity: 0, 
-									y: 60,
-									rotateX: -15 
-								},
-								visible: { 
-									opacity: 1, 
-									y: 0,
-									rotateX: 0,
-									transition: {
-										duration: 0.6,
-										ease: "easeOut"
-									}
-								}
-							}}
-							whileHover={{
-								y: -8,
-								transition: { duration: 0.3 }
-							}}
-						>
-							{/* Card Glow Effect */}
-							<div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/5 to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-							
-							{/* Floating Orbs in Card */}
-							<div className="absolute top-2 right-2 w-2 h-2 bg-blue-400/30 rounded-full animate-pulse" />
-							<div className="absolute bottom-2 left-2 w-1 h-1 bg-purple-400/40 rounded-full animate-ping" 
-								 style={{ animationDelay: `${index * 0.5}s` }} />
-
-							<div className="flex flex-col items-center text-center relative z-10 flex-1">
-								<motion.div 
-									className="w-24 h-24 xl:w-28 xl:h-28 2xl:w-32 2xl:h-32 mx-auto mb-4 xl:mb-6 overflow-hidden rounded-full shadow-lg transform group-hover:scale-105 transition-transform duration-500 relative"
-									animate={{
-										y: [0, -3, 0],
-										rotate: [0, 2, -2, 0]
-									}}
-									transition={{
-										duration: 6 + index * 0.3,
-										repeat: Infinity,
-										ease: "easeInOut",
-										delay: index * 0.2
-									}}
-								>
-									<motion.div
-										className="relative z-10"
-										transition={{
-											duration: 0.8,
-											ease: "easeOut"
-										}}
-									>
-										<AvatarSVG initial={member.name[0]} context={`grid-${index}`} />
-									</motion.div>
-								</motion.div>
-								<motion.h3
-									className="text-xl xl:text-2xl 2xl:text-3xl font-bold text-white mb-1 xl:mb-2 relative"
-									whileHover={{ scale: 1.05 }}
-									transition={{ duration: 0.2 }}
-								>
-									{member.name}
-									<div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 group-hover:w-full transition-all duration-300" />
-								</motion.h3>
-								<p className="text-blue-400 font-semibold text-base xl:text-lg 2xl:text-xl mb-3 xl:mb-4">
-									{member.role}
-								</p>
-								<p className="text-gray-200 text-sm xl:text-base 2xl:text-lg leading-relaxed flex-1 flex items-center justify-center">
-									{member.description}
-								</p>
-							</div>
-						</motion.div>
-					))}
-				</motion.div>
 			</div>
 		</section>
 	);

@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 
 const NavBar = () => {
 	const [scrolled, setScrolled] = useState(false);
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -16,6 +17,16 @@ const NavBar = () => {
 		window.addEventListener('scroll', handleScroll);
 		return () => window.removeEventListener('scroll', handleScroll);
 	}, []);
+
+	const handleLinkClick = () => {
+		setMobileMenuOpen(false);
+	};
+
+	const menuItems = [
+		{ href: '#board', label: 'Board Members' },
+		{ href: '#events', label: 'Events' },
+		{ href: '#connect', label: 'Connect' },
+	];
 
 	return (
 		<motion.nav
@@ -29,14 +40,14 @@ const NavBar = () => {
 			{/* Subtle glow effect */}
 			<div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-blue-500/5 opacity-50" />
 
-			<div className="container mx-auto px-6 py-4 relative">
+			<div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 relative">
 				<div className="flex items-center justify-between">
 					<Link
 						href="/"
-						className="text-2xl font-bold text-white group relative"
+						className="text-lg sm:text-xl md:text-2xl font-bold text-white group relative"
+						onClick={handleLinkClick}
 					>
 						<motion.span
-							className=""
 							whileHover={{ scale: 1.05 }}
 							transition={{ duration: 0.2 }}
 						>
@@ -45,12 +56,9 @@ const NavBar = () => {
 						<div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 group-hover:w-full transition-all duration-300" />
 					</Link>
 
-					<div className="hidden md:flex space-x-8 items-center">
-						{[
-							{ href: '#events', label: 'Events' },
-							{ href: '#board', label: 'Board Members' },
-							{ href: '#contact', label: 'Contact' },
-						].map((item, index) => (
+					{/* Desktop Menu */}
+					<div className="hidden md:flex space-x-6 lg:space-x-8 items-center">
+						{menuItems.map((item, index) => (
 							<motion.div
 								key={item.href}
 								initial={{ opacity: 0, y: -20 }}
@@ -62,7 +70,7 @@ const NavBar = () => {
 							>
 								<Link
 									href={item.href}
-									className="text-white/80 hover:text-white transition-all duration-300 relative group font-medium"
+									className="text-white/80 hover:text-white transition-all duration-300 relative group font-medium text-sm lg:text-base"
 								>
 									<span className="relative z-10">
 										{item.label}
@@ -77,25 +85,84 @@ const NavBar = () => {
 						))}
 					</div>
 
-					{/* Mobile menu button (you can expand this later) */}
+					{/* Mobile Menu Button */}
 					<div className="md:hidden">
-						<button className="text-white/80 hover:text-white transition-colors">
-							<svg
-								className="w-6 h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
+						<button 
+							className="text-white/80 hover:text-white transition-colors p-2 -mr-2"
+							onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+							aria-label="Toggle mobile menu"
+						>
+							<motion.div
+								animate={mobileMenuOpen ? "open" : "closed"}
+								className="w-6 h-6 flex flex-col justify-center items-center"
 							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="2"
-									d="M4 6h16M4 12h16M4 18h16"
+								<motion.span
+									className="w-6 h-0.5 bg-current block"
+									variants={{
+										closed: { rotate: 0, y: 0 },
+										open: { rotate: 45, y: 2 }
+									}}
+									transition={{ duration: 0.2 }}
 								/>
-							</svg>
+								<motion.span
+									className="w-6 h-0.5 bg-current block mt-1"
+									variants={{
+										closed: { opacity: 1 },
+										open: { opacity: 0 }
+									}}
+									transition={{ duration: 0.2 }}
+								/>
+								<motion.span
+									className="w-6 h-0.5 bg-current block mt-1"
+									variants={{
+										closed: { rotate: 0, y: 0 },
+										open: { rotate: -45, y: -10 }
+									}}
+									transition={{ duration: 0.2 }}
+								/>
+							</motion.div>
 						</button>
 					</div>
 				</div>
+
+				{/* Mobile Menu */}
+				<AnimatePresence>
+					{mobileMenuOpen && (
+						<motion.div
+							initial={{ opacity: 0, height: 0 }}
+							animate={{ opacity: 1, height: "auto" }}
+							exit={{ opacity: 0, height: 0 }}
+							transition={{ duration: 0.3 }}
+							className="md:hidden mt-4 pt-4 border-t border-white/10"
+						>
+							<div className="flex flex-col space-y-4">
+								{menuItems.map((item, index) => (
+									<motion.div
+										key={item.href}
+										initial={{ opacity: 0, x: -20 }}
+										animate={{ opacity: 1, x: 0 }}
+										exit={{ opacity: 0, x: -20 }}
+										transition={{ 
+											duration: 0.3, 
+											delay: index * 0.1 
+										}}
+									>
+										<Link
+											href={item.href}
+											className="text-white/80 hover:text-white transition-all duration-300 relative group font-medium text-lg py-2 block"
+											onClick={handleLinkClick}
+										>
+											<span className="relative z-10">
+												{item.label}
+											</span>
+											<div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300" />
+										</Link>
+									</motion.div>
+								))}
+							</div>
+						</motion.div>
+					)}
+				</AnimatePresence>
 			</div>
 		</motion.nav>
 	);

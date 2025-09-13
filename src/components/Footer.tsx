@@ -5,7 +5,7 @@ import { FaGithub, FaInstagram, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
 const Footer = () => {
   return (
-    <footer id="contact" className="relative bg-black py-20 overflow-hidden">
+    <footer id="connect" className="relative bg-black py-12 sm:py-16 md:py-20 overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
@@ -54,13 +54,13 @@ const Footer = () => {
         </motion.div>
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
           >
             Connect With Us
           </motion.h2>
@@ -70,7 +70,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-white/70 mb-12 text-lg"
+            className="text-white/70 mb-8 sm:mb-10 md:mb-12 text-sm sm:text-base md:text-lg px-4"
           >
             Join our community and stay updated with the latest in AI
           </motion.p>
@@ -81,7 +81,7 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="flex justify-center space-x-8 mb-12"
+            className="flex justify-center space-x-4 sm:space-x-6 md:space-x-8 mb-8 sm:mb-10 md:mb-12"
           >
             {[
               { icon: FaGithub, href: "https://github.com/adelphiaiclub", label: "GitHub" },
@@ -105,8 +105,8 @@ const Footer = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 scale-150" />
                 
                 {/* Icon container */}
-                <div className="relative w-14 h-14 bg-white/5 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 group-hover:border-white/30 transition-all duration-300">
-                  <social.icon className="text-2xl text-white/70 group-hover:text-white transition-colors duration-300" />
+                <div className="relative w-12 h-12 sm:w-14 sm:h-14 bg-white/5 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 group-hover:border-white/30 transition-all duration-300">
+                  <social.icon className="text-xl sm:text-2xl text-white/70 group-hover:text-white transition-colors duration-300" />
                 </div>
               </motion.a>
             ))}
@@ -118,20 +118,20 @@ const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.6 }}
-            className="bg-white/5 backdrop-blur-md rounded-xl p-8 border border-white/10 mb-8"
+            className="bg-white/5 backdrop-blur-md rounded-xl p-4 sm:p-6 md:p-8 border border-white/10 mb-6 sm:mb-8"
           >
-            <div className="grid md:grid-cols-3 gap-6 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 text-center">
               <div>
-                <h3 className="text-white font-semibold mb-2">Organization</h3>
-                <p className="text-white/70">Adelphi AI Society</p>
+                <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">Organization</h3>
+                <p className="text-white/70 text-xs sm:text-sm">Adelphi AI Society</p>
               </div>
               <div>
-                <h3 className="text-white font-semibold mb-2">Location</h3>
-                <p className="text-white/70">1 South Ave, Garden City, NY 11530</p>
+                <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">Location</h3>
+                <p className="text-white/70 text-xs sm:text-sm">1 South Ave, Garden City, NY 11530</p>
               </div>
-              <div>
-                <h3 className="text-white font-semibold mb-2">Meeting Room</h3>
-                <p className="text-white/70">Science Building, Room 409</p>
+              <div className="sm:col-span-2 md:col-span-1">
+                <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">Meeting Room</h3>
+                <p className="text-white/70 text-xs sm:text-sm">Science Building, Room 409</p>
               </div>
             </div>
           </motion.div>
@@ -142,7 +142,7 @@ const Footer = () => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.8 }}
-            className="text-white/50 text-sm"
+            className="text-white/50 text-xs sm:text-sm"
           >
             <p>© 2025 Adelphi AI Society. All rights reserved.</p>
           </motion.div>
