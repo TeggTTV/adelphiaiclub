@@ -1,28 +1,35 @@
+# *
 User-agent: *
 Allow: /
+Disallow: /404
+Disallow: /500
+Disallow: /api/*
+Disallow: /_next/*
+Disallow: /admin/*
 
-# Block AI crawlers
+# GPTBot
 User-agent: GPTBot
 Disallow: /
 
+# ChatGPT-User
 User-agent: ChatGPT-User
 Disallow: /
 
+# CCBot
 User-agent: CCBot
 Disallow: /
 
+# anthropic-ai
 User-agent: anthropic-ai
 Disallow: /
 
+# Claude-Web
 User-agent: Claude-Web
 Disallow: /
 
-# Disallow paths
-Disallow: /404
-Disallow: /500
-Disallow: /api/
-Disallow: /_next/
-Disallow: /admin/
+# Host
+Host: https://adelphiaisociety.vercel.app
 
-# Sitemap
+# Sitemaps
 Sitemap: https://adelphiaisociety.vercel.app/sitemap.xml
+Sitemap: https://adelphiaisociety.vercel.app/server-sitemap.xml

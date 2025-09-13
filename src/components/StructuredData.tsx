@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 
 interface StructuredDataProps {
   type?: 'organization' | 'event' | 'person' | 'webpage';
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
 }
 
 const StructuredData = ({ type = 'organization', data = {} }: StructuredDataProps) => {

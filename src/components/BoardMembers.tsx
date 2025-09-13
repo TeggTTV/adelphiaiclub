@@ -1,10 +1,6 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { BoardMember } from '@/types';
-import GlowCard from './bits/GlowCard';
-import Orb from './bits/Orb';
-import ParticleConnections from './bits/ParticleConnection';
 import Particles from './bits/Particles';
 import { useState, useEffect } from 'react';
 
