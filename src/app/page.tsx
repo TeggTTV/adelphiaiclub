@@ -8,7 +8,8 @@ export default function Home() {
   return (
     <>
       <NavBar />
-      <main>
+      <main className="relative">
+
         <Hero />
         <BoardMembers />
         <Events />
