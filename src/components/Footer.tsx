@@ -84,9 +84,9 @@ const Footer = () => {
             className="flex justify-center space-x-4 sm:space-x-6 md:space-x-8 mb-8 sm:mb-10 md:mb-12"
           >
             {[
-              { icon: FaGithub, href: "https://github.com/adelphiaiclub", label: "GitHub" },
-              { icon: FaInstagram, href: "https://instagram.com/adelphiaiclub", label: "Instagram" },
-              { icon: FaLinkedin, href: "https://linkedin.com/company/adelphiaiclub", label: "LinkedIn" },
+              { icon: FaGithub, href: "https://github.com/adelphiaisociety", label: "GitHub" },
+              { icon: FaInstagram, href: "https://instagram.com/adelphiaisociety", label: "Instagram" },
+              { icon: FaLinkedin, href: "https://linkedin.com/company/adelphiaisociety", label: "LinkedIn" },
               { icon: FaEnvelope, href: "mailto:aiclub@adelphi.edu", label: "Email" }
             ].map((social, index) => (
               <motion.a

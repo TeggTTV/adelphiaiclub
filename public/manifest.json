@@ -1,0 +1,31 @@
+{
+  "name": "Adelphi AI Society",
+  "short_name": "Adelphi AI",
+  "description": "Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": [
+    "education",
+    "technology",
+    "social"
+  ],
+  "lang": "en-US",
+  "dir": "ltr"
+}

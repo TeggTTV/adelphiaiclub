@@ -13,9 +13,70 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: 'Adelphi AI Society',
+	title: {
+		default: 'Adelphi AI Society',
+		template: '%s | Adelphi AI Society'
+	},
 	description:
-		'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University',
+		'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University. Join our community of students and faculty exploring artificial intelligence through workshops, hackathons, and guest speakers.',
+	keywords: [
+		'Adelphi University',
+		'AI Society',
+		'Artificial Intelligence',
+		'Machine Learning',
+		'Student Organization',
+		'AI Education',
+		'Technology Club',
+		'Computer Science',
+		'Innovation',
+		'Workshops',
+		'Hackathons'
+	],
+	authors: [{ name: 'Adelphi AI Society' }],
+	creator: 'Adelphi AI Society',
+	publisher: 'Adelphi AI Society',
+	metadataBase: new URL('https://adelphiaisociety.vercel.app'),
+	alternates: {
+		canonical: '/',
+	},
+	openGraph: {
+		type: 'website',
+		locale: 'en_US',
+		url: 'https://adelphiaisociety.vercel.app',
+		title: 'Adelphi AI Society',
+		description:
+			'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University. Join our community of students and faculty exploring artificial intelligence.',
+		siteName: 'Adelphi AI Society',
+		images: [
+			{
+				url: '/og-image.jpg',
+				width: 1200,
+				height: 630,
+				alt: 'Adelphi AI Society - Empowering Minds, Shaping Futures',
+			},
+		],
+	},
+	twitter: {
+		card: 'summary_large_image',
+		title: 'Adelphi AI Society',
+		description:
+			'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University.',
+		images: ['/og-image.jpg'],
+	},
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			'max-video-preview': -1,
+			'max-image-preview': 'large',
+			'max-snippet': -1,
+		},
+	},
+	verification: {
+		google: 'your-google-verification-code', // Replace with actual verification code
+	},
 };
 
 export default function RootLayout({
@@ -25,6 +86,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
+			<head>
+				<link rel="manifest" href="/manifest.json" />
+				<link rel="apple-touch-icon" href="/icon-192.png" />
+				<meta name="theme-color" content="#3B82F6" />
+				<meta name="msapplication-TileColor" content="#3B82F6" />
+				<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
