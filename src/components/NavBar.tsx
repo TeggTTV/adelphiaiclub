@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { trackNavigation } from '@/lib/analytics';
 
 const NavBar = () => {
 	const [scrolled, setScrolled] = useState(false);
@@ -18,8 +19,13 @@ const NavBar = () => {
 		return () => window.removeEventListener('scroll', handleScroll);
 	}, []);
 
-	const handleLinkClick = () => {
-		setMobileMenuOpen(false);
+	const handleLinkClick = (href?: string) => {
+		return () => {
+			setMobileMenuOpen(false);
+			if (href) {
+				trackNavigation(href);
+			}
+		};
 	};
 
 	const menuItems = [
@@ -45,7 +51,7 @@ const NavBar = () => {
 					<Link
 						href="/"
 						className="text-lg sm:text-xl md:text-2xl font-bold text-white group relative"
-						onClick={handleLinkClick}
+						onClick={handleLinkClick('/')}
 					>
 						<motion.span
 							whileHover={{ scale: 1.05 }}
@@ -71,6 +77,7 @@ const NavBar = () => {
 								<Link
 									href={item.href}
 									className="text-white/80 hover:text-white transition-all duration-300 relative group font-medium text-sm lg:text-base"
+									onClick={handleLinkClick(item.href)}
 								>
 									<span className="relative z-10">
 										{item.label}
@@ -150,7 +157,7 @@ const NavBar = () => {
 										<Link
 											href={item.href}
 											className="text-white/80 hover:text-white transition-all duration-300 relative group font-medium text-lg py-2 block"
-											onClick={handleLinkClick}
+											onClick={handleLinkClick(item.href)}
 										>
 											<span className="relative z-10">
 												{item.label}
