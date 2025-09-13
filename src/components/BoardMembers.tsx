@@ -33,21 +33,35 @@ const AvatarSVG = ({ initial }: { initial: string }) => (
 
 const boardMembers: BoardMember[] = [
   {
-    name: "John Doe",
+    name: "Santiago Rodriguez",
     role: "President",
-    description: "Computer Science senior with a focus on Machine Learning"
+    description: "Artificial Intelligence major dedicated to improving lives through AI awareness and education. Leading initiatives to help students and faculty harness the power of AI tools."
   },
   {
-    name: "Jane Smith",
+    name: "Joseph Jazwinski",
+    role: "Senior Software Engineer",
+    description: "Computer Science major with 7+ years of coding experience, specializing in TypeScript web development and backend systems"
+  },
+  {
+    name: "Doyan Bendezu",
     role: "Vice President",
-    description: "Mathematics junior passionate about AI applications"
+    description: "Nursing major bringing healthcare perspective to AI applications. Focused on bridging the gap between medical care and artificial intelligence."
   },
   {
-    name: "Mike Johnson",
-    role: "Secretary",
-    description: "Data Science sophomore interested in Neural Networks"
+    name: "Michael Riccio",
+    role: "Treasurer",
+    description: "Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology."
   },
-  // Add more board members as needed
+  {
+    name: "Ann-lyse Joseph",
+    role: "Secretary",
+    description: "Health Science major documenting our journey and coordinating club activities. Interested in AI applications in healthcare and wellness."
+  },
+  // {
+  //   name: "Sixia Chen",
+  //   role: "Faculty Advisor",
+  //   description: "Assistant Professor of Mathematics and Computer Science at Adelphi University"
+  // }
 ];
 
 const BoardMembers = () => {
@@ -67,20 +81,24 @@ const BoardMembers = () => {
           {boardMembers.map((member, index) => (
             <motion.div
               key={member.name}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300"
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ 
+                duration: 0.5,
+                delay: index * 0.1,
+                ease: "easeOut"
+              }}
+              className="bg-white rounded-lg p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-[#FDB515]/20"
             >
-              <div className="w-32 h-32 mx-auto mb-4 overflow-hidden rounded-full">
+              <div className="w-36 h-36 mx-auto mb-6 overflow-hidden rounded-full shadow-md transform hover:scale-105 transition-transform duration-300">
                 <AvatarSVG initial={member.name[0]} />
               </div>
-              <h3 className="text-xl font-semibold text-[#65513C] text-center">
+              <h3 className="text-2xl font-bold text-[#65513C] text-center mb-2">
                 {member.name}
               </h3>
-              <p className="text-[#FDB515] text-center mb-2">{member.role}</p>
-              <p className="text-gray-600 text-center">{member.description}</p>
+              <p className="text-[#FDB515] font-semibold text-lg text-center mb-4">{member.role}</p>
+              <p className="text-gray-600 text-center leading-relaxed">{member.description}</p>
             </motion.div>
           ))}
         </div>

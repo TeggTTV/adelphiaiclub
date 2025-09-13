@@ -2,20 +2,12 @@
 
 import { motion } from 'framer-motion';
 
-interface Event {
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  description: string;
-}
-
-const upcomingEvents: Event[] = [
+const upcomingEvents = [
   {
     title: "Introduction to Machine Learning Workshop",
     date: "Sept 15, 2025",
-    time: "3:00 PM - 4:30 PM",
-    location: "Science Building Room 309",
+    time: "2:00 PM - 4:00 PM",
+    location: "Science Building Room 301",
     description: "Join us for a hands-on workshop where we'll explore the basics of machine learning using Python and scikit-learn."
   },
   {
@@ -51,42 +43,21 @@ const Events = () => {
           {upcomingEvents.map((event, index) => (
             <motion.div
               key={event.title}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300"
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ 
+                duration: 0.5,
+                delay: index * 0.1,
+                ease: "easeOut"
+              }}
+              className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all duration-300"
             >
-              {/* Event Card Header */}
-              <div className="bg-[#65513C]/5 p-6 border-b border-[#65513C]/10">
-                <h3 className="text-xl font-semibold text-[#65513C] mb-2">
-                  {event.title}
-                </h3>
-                <div className="flex flex-col space-y-1">
-                  <p className="text-[#FDB515] font-medium text-sm">
-                    {event.date} • {event.time}
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    📍 {event.location}
-                  </p>
-                </div>
-              </div>
-
-              {/* Event Card Body */}
-              <div className="p-6 bg-white">
-                <p className="text-gray-600">
-                  {event.description}
-                </p>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="mt-6 w-full bg-[#FDB515] hover:bg-[#FDB515]/80 
-                           text-black rounded-md 
-                           py-2 px-4 transition-all duration-200 font-medium shadow-md hover:shadow-xl"
-                >
-                  Learn More
-                </motion.button>
-              </div>
+              <h3 className="text-xl font-semibold text-[#65513C] mb-2">{event.title}</h3>
+              <p className="text-[#FDB515] mb-1">{event.date}</p>
+              <p className="text-gray-600 mb-1">{event.time}</p>
+              <p className="text-gray-600 mb-4">{event.location}</p>
+              <p className="text-gray-700">{event.description}</p>
             </motion.div>
           ))}
         </div>
