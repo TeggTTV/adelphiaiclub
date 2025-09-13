@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: {
 		default: 'Adelphi AI Society',
-		template: '%s | Adelphi AI Society'
+		template: '%s | Adelphi AI Society',
 	},
 	description:
 		'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University. Join our community of students and faculty exploring artificial intelligence through workshops, hackathons, and guest speakers.',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 		'Computer Science',
 		'Innovation',
 		'Workshops',
-		'Hackathons'
+		'Hackathons',
 	],
 	authors: [{ name: 'Adelphi AI Society' }],
 	creator: 'Adelphi AI Society',
@@ -93,14 +93,19 @@ export default function RootLayout({
 				<link rel="apple-touch-icon" href="/icon-192.png" />
 				<meta name="theme-color" content="#3B82F6" />
 				<meta name="msapplication-TileColor" content="#3B82F6" />
-				<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+				<meta
+					name="viewport"
+					content="width=device-width, initial-scale=1, viewport-fit=cover"
+				/>
 			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
 				{children}
 				<Analytics />
-				<GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'} />
+				<GoogleAnalytics
+					gaId={process.env.NEXT_PUBLIC_GA_ID || 'G-XXXXXXXXXX'}
+				/>
 			</body>
 		</html>
 	);

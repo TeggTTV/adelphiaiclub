@@ -5,10 +5,6 @@ import { useRef } from 'react';
 import SplitText from './SplitText';
 import DarkVeil from './DarkVeil';
 
-const handleAnimationComplete = () => {
-	console.log('All letters have animated!');
-};
-
 const Hero = () => {
 	const heroRef = useRef<HTMLDivElement>(null);
 	const { scrollYProgress } = useScroll({
@@ -54,9 +50,6 @@ const Hero = () => {
 								to={{ opacity: 1, y: 0, rotateX: 0 }}
 								threshold={0.1}
 								rootMargin="-100px"
-								onLetterAnimationComplete={
-									handleAnimationComplete
-								}
 							/>
 						</motion.div>
 
