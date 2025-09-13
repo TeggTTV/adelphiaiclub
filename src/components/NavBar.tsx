@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { trackNavigation } from '@/lib/analytics';
@@ -50,15 +51,26 @@ const NavBar = () => {
 				<div className="flex items-center justify-between">
 					<Link
 						href="/"
-						className="text-lg sm:text-xl md:text-2xl font-bold text-white group relative"
+						className="flex items-center space-x-3 group relative"
 						onClick={handleLinkClick('/')}
 					>
-						<motion.span
+						<motion.div
 							whileHover={{ scale: 1.05 }}
 							transition={{ duration: 0.2 }}
+							className="flex items-center space-x-3"
 						>
-							Adelphi AI Society
-						</motion.span>
+							<Image
+								src="/TRANSPARENT ICON.png"
+								alt="Adelphi AI Society Logo"
+								width={40}
+								height={40}
+								className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
+								priority
+							/>
+							<span className="text-lg sm:text-xl md:text-2xl font-bold text-white">
+								Adelphi AI Society
+							</span>
+						</motion.div>
 						<div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 group-hover:w-full transition-all duration-300" />
 					</Link>
 

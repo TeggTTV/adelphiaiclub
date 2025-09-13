@@ -51,9 +51,9 @@ export const metadata: Metadata = {
 		siteName: 'Adelphi AI Society',
 		images: [
 			{
-				url: '/og-image.jpg',
-				width: 1200,
-				height: 630,
+				url: '/DARK LOGO.png',
+				width: 512,
+				height: 512,
 				alt: 'Adelphi AI Society - Empowering Minds, Shaping Futures',
 			},
 		],
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
 		title: 'Adelphi AI Society',
 		description:
 			'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University.',
-		images: ['/og-image.jpg'],
+		images: ['/DARK LOGO.png'],
 	},
 	robots: {
 		index: true,
@@ -90,7 +90,8 @@ export default function RootLayout({
 		<html lang="en">
 			<head>
 				<link rel="manifest" href="/manifest.json" />
-				<link rel="apple-touch-icon" href="/icon-192.png" />
+				<link rel="apple-touch-icon" href="/TRANSPARENT ICON.png" />
+				<link rel="icon" href="/TRANSPARENT ICON.png" />
 				<meta name="theme-color" content="#3B82F6" />
 				<meta name="msapplication-TileColor" content="#3B82F6" />
 				<meta

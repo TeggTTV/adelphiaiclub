@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
+import Image from 'next/image';
 import SplitText from './SplitText';
 import DarkVeil from './DarkVeil';
 
@@ -36,6 +37,23 @@ const Hero = () => {
 			<div className="relative z-30 flex min-h-screen">
 				<div className="w-full flex items-center justify-center px-4 sm:px-8 md:px-12">
 					<div className="max-w-4xl w-full text-center sm:text-left">
+						{/* Logo Section */}
+						{/* <motion.div
+							initial={{ opacity: 0, scale: 0.8 }}
+							animate={{ opacity: 1, scale: 1 }}
+							transition={{ duration: 0.6, ease: "easeOut" }}
+							className="flex justify-center sm:justify-start mb-6 sm:mb-8"
+						>
+							<Image
+								src="/TRANSPARENT ICON.png"
+								alt="Adelphi AI Society Logo"
+								width={120}
+								height={120}
+								className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32"
+								priority
+							/>
+						</motion.div> */}
+
 						<motion.div
 						// style={{ opacity: opacity }}
 						>

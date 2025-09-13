@@ -20,7 +20,7 @@ const StructuredData = ({ type = 'organization', data = {} }: StructuredDataProp
         name: 'Adelphi AI Society',
         alternateName: 'Adelphi Artificial Intelligence Society',
         url: baseUrl,
-        logo: `${baseUrl}/logo.png`,
+        logo: `${baseUrl}/DARK LOGO.png`,
         description: 'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University. Student organization focused on artificial intelligence education, workshops, and innovation.',
         foundingDate: '2024',
         areaServed: {

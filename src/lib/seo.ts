@@ -17,7 +17,7 @@ export function generateSEO({
   description,
   keywords = [],
   canonical,
-  ogImage = '/og-image.jpg',
+  ogImage = '/DARK LOGO.png',
   ogType = 'website',
   twitterCard = 'summary_large_image',
   noindex = false,

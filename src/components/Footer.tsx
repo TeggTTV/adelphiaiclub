@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { FaGithub, FaInstagram, FaLinkedin, FaEnvelope } from 'react-icons/fa';
 
@@ -56,14 +57,34 @@ const Footer = () => {
 
       <div className="container mx-auto px-4 sm:px-6 md:px-8 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
-          <motion.h2
+          {/* Logo Section */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
+            className="flex flex-col items-center mb-6 sm:mb-8"
+          >
+            <Image
+              src="/TRANSPARENT ICON.png"
+              alt="Adelphi AI Society Logo"
+              width={80}
+              height={80}
+              className="w-16 h-16 sm:w-20 sm:h-20 mb-4"
+            />
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+              Adelphi AI Society
+            </h2>
+          </motion.div>
+
+          <motion.h3
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-lg sm:text-xl md:text-2xl font-semibold mb-3 sm:mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent"
           >
             Connect With Us
-          </motion.h2>
+          </motion.h3>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
