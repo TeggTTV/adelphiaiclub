@@ -2,7 +2,6 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import Image from 'next/image';
 import SplitText from './SplitText';
 import DarkVeil from './DarkVeil';
 
