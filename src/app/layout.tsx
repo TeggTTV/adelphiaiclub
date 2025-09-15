@@ -91,8 +91,10 @@ export default function RootLayout({
 		<html lang="en">
 			<head>
 				<link rel="manifest" href="/manifest.json" />
+				<link rel="icon" href="/favicon.ico" sizes="any" />
+				<link rel="icon" href="/TRANSPARENT ICON.png" type="image/png" />
 				<link rel="apple-touch-icon" href="/TRANSPARENT ICON.png" />
-				<link rel="icon" href="/TRANSPARENT ICON.png" />
+				<link rel="shortcut icon" href="/favicon.ico" />
 				<meta name="theme-color" content="#3B82F6" />
 				<meta name="msapplication-TileColor" content="#3B82F6" />
 				<meta
