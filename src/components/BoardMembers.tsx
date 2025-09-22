@@ -61,15 +61,15 @@ const boardMembers = [
 		name: 'Santiago Rodriguez',
 		role: 'President',
 		description:
-			'Artificial Intelligence major dedicated to improving lives through AI awareness and education. Leading initiatives to help students and faculty harness the power of AI tools.',
-		instagram: 'https://instagram.com/santiagorodriguez', // Replace with actual Instagram handle
+			'Aritifical Intelligence major passionate about exploring emerging technologies to spark new ideas, unlock creativity, and drive meaningful progress.',
+		instagram: 'https://instagram.com/_itssantiagox', // Replace with actual Instagram handle
 	},
 	{
 		name: 'Doryan Bendezu',
 		role: 'Vice President',
 		description:
 			'Nursing major bringing healthcare perspective to AI applications. Focused on bridging the gap between medical care and artificial intelligence.',
-		instagram: 'https://instagram.com/doryanbendezu', // Replace with actual Instagram handle
+		instagram: 'https://instagram.com/doctordbd', // Replace with actual Instagram handle
 	},
 	{
 		name: 'Joseph Jazwinski',
@@ -83,15 +83,15 @@ const boardMembers = [
 		role: 'Treasurer',
 		description:
 			'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
-		instagram: 'https://instagram.com/michaelriccio', // Replace with actual Instagram handle
+		instagram: 'https://instagram.com/mikecankindacook', // Replace with actual Instagram handle
 	},
-	{
-		name: 'Ann-lyse Joseph',
-		role: 'Secretary',
-		description:
-			'Health Science major documenting our journey and coordinating club activities. Interested in AI applications in healthcare and wellness.',
-		instagram: 'https://instagram.com/annlysejoseph', // Replace with actual Instagram handle
-	},
+	// {
+	// 	name: 'Ann-lyse Joseph',
+	// 	role: 'Secretary',
+	// 	description:
+	// 		'Health Science major documenting our journey and coordinating club activities. Interested in AI applications in healthcare and wellness.',
+	// 	instagram: 'https://instagram.com/annlysejoseph', // Replace with actual Instagram handle
+	// },
 ];
 
 const BoardMembers = () => {

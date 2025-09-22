@@ -75,7 +75,7 @@ const Hero = () => {
 						>
 							<SplitText
 								text={
-									'Join our community of students passionate about machine learning, neural networks, and the future of AI.'
+									'Join our community in the exploration of Aritifical Intelligence as a way to amplify innovation, creativity, and growth.'
 								}
 								className="text-sm sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 md:mb-12 leading-relaxed px-4 sm:px-0"
 								delay={10}
