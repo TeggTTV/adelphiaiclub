@@ -32,6 +32,7 @@ const NavBar = () => {
 	const menuItems = [
 		{ href: '#board', label: 'Board Members' },
 		{ href: '#events', label: 'Events' },
+		{ href: '#faq', label: 'FAQ' },
 		{ href: '#connect', label: 'Connect' },
 	];
 
@@ -106,20 +107,20 @@ const NavBar = () => {
 
 					{/* Mobile Menu Button */}
 					<div className="md:hidden">
-						<button 
+						<button
 							className="text-white/80 hover:text-white transition-colors p-2 -mr-2"
 							onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
 							aria-label="Toggle mobile menu"
 						>
 							<motion.div
-								animate={mobileMenuOpen ? "open" : "closed"}
+								animate={mobileMenuOpen ? 'open' : 'closed'}
 								className="w-6 h-6 flex flex-col justify-center items-center"
 							>
 								<motion.span
 									className="w-6 h-0.5 bg-current block"
 									variants={{
 										closed: { rotate: 0, y: 0 },
-										open: { rotate: 45, y: 2 }
+										open: { rotate: 45, y: 2 },
 									}}
 									transition={{ duration: 0.2 }}
 								/>
@@ -127,7 +128,7 @@ const NavBar = () => {
 									className="w-6 h-0.5 bg-current block mt-1"
 									variants={{
 										closed: { opacity: 1 },
-										open: { opacity: 0 }
+										open: { opacity: 0 },
 									}}
 									transition={{ duration: 0.2 }}
 								/>
@@ -135,7 +136,7 @@ const NavBar = () => {
 									className="w-6 h-0.5 bg-current block mt-1"
 									variants={{
 										closed: { rotate: 0, y: 0 },
-										open: { rotate: -45, y: -10 }
+										open: { rotate: -45, y: -10 },
 									}}
 									transition={{ duration: 0.2 }}
 								/>
@@ -149,7 +150,7 @@ const NavBar = () => {
 					{mobileMenuOpen && (
 						<motion.div
 							initial={{ opacity: 0, height: 0 }}
-							animate={{ opacity: 1, height: "auto" }}
+							animate={{ opacity: 1, height: 'auto' }}
 							exit={{ opacity: 0, height: 0 }}
 							transition={{ duration: 0.3 }}
 							className="md:hidden mt-4 pt-4 border-t border-white/10"
@@ -161,9 +162,9 @@ const NavBar = () => {
 										initial={{ opacity: 0, x: -20 }}
 										animate={{ opacity: 1, x: 0 }}
 										exit={{ opacity: 0, x: -20 }}
-										transition={{ 
-											duration: 0.3, 
-											delay: index * 0.1 
+										transition={{
+											duration: 0.3,
+											delay: index * 0.1,
 										}}
 									>
 										<Link
