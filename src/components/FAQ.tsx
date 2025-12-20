@@ -17,7 +17,7 @@ const FAQItem = ({ question, answer, isOpen, onToggle }: FAQItemProps) => {
 			initial={{ opacity: 0, y: 20 }}
 			whileInView={{ opacity: 1, y: 0 }}
 			viewport={{ once: true }}
-			className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 overflow-hidden hover:border-white/20 transition-colors duration-300"
+			className="glass rounded-xl overflow-hidden hover:border-white/30 transition-all duration-300"
 		>
 			<button
 				onClick={onToggle}
@@ -43,7 +43,7 @@ const FAQItem = ({ question, answer, isOpen, onToggle }: FAQItemProps) => {
 						exit={{ height: 0, opacity: 0 }}
 						transition={{ duration: 0.3 }}
 					>
-						<div className="px-4 sm:px-6 pb-4 sm:pb-5 text-white/70 text-sm sm:text-base leading-relaxed border-t border-white/10 pt-4">
+						<div className="px-4 sm:px-6 pb-4 sm:pb-5 text-gray-300 text-sm sm:text-base leading-relaxed border-t border-white/10 pt-4">
 							{answer}
 						</div>
 					</motion.div>
@@ -62,10 +62,6 @@ const FAQ = () => {
 			answer: 'Not at all! We welcome members of all skill levels, from complete beginners to experienced programmers. Our workshops are designed to accommodate everyone, and we have mentorship programs for those just starting out. All you need is curiosity and enthusiasm for AI!',
 		},
 		{
-			question: 'How much does membership cost?',
-			answer: 'Membership to the Adelphi AI Society is completely free! We believe in making AI education accessible to everyone. Some special events or workshops may have optional fees for materials, but we always strive to keep everything as affordable as possible.',
-		},
-		{
 			question: "What's the time commitment?",
 			answer: "We're flexible! We typically host 2-3 events per month, including workshops, guest speakers, and social gatherings. You can participate as much or as little as you'd like. There's no pressure to attend every event—come to what interests you and fits your schedule.",
 		},
@@ -75,14 +71,15 @@ const FAQ = () => {
 		},
 		{
 			question: 'What kind of events do you host?',
-			answer: 'We host a variety of events including hands-on coding workshops, guest speaker sessions with industry professionals, hackathons, social gatherings, study groups, and collaborative projects. We also organize field trips to tech companies and AI conferences when possible.',
+			answer: 'We host a variety of events including hands-on coding workshops, guest speaker sessions with industry professionals, hackathons, social gatherings, and collaborative projects.',
 		},
 		{
 			question: 'How can I get more involved?',
 			answer: "There are many ways to get involved beyond attending events! You can join our project teams, help organize events, contribute to our blog, become a workshop instructor, or apply for a board position. We're always looking for enthusiastic members who want to help grow our community.",
 		},
 		{
-			question: 'Can I present my AI project at a meeting?',
+			question:
+				'Can I present my AI and Computer Science projects at a meeting?',
 			answer: "Absolutely! We encourage members to share their projects and research. It's a great way to get feedback, practice presenting, and inspire others. Just reach out to any board member, and we'll help you schedule a presentation slot at an upcoming meeting.",
 		},
 		{
@@ -94,7 +91,7 @@ const FAQ = () => {
 	return (
 		<section
 			id="faq"
-			className="relative py-12 sm:py-16 md:py-20 bg-gradient-to-br from-black via-purple-900/10 to-black overflow-hidden"
+			className="relative py-12 sm:py-16 md:py-20 bg-transparent overflow-hidden"
 		>
 			{/* Animated Background */}
 			<div className="absolute inset-0 opacity-10">

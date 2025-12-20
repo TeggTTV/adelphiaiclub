@@ -2,7 +2,10 @@ import NavBar from '@/components/NavBar';
 import Hero from '@/components/Hero';
 import Events from '@/components/Events';
 import BoardMembers from '@/components/BoardMembers';
+import Testimonials from '@/components/Testimonials';
 import FAQ from '@/components/FAQ';
+import CTA from '@/components/CTA';
+import ContactForm from '@/components/ContactForm';
 import Footer from '@/components/Footer';
 import StructuredData from '@/components/StructuredData';
 
@@ -23,10 +26,12 @@ export default function Home() {
 				<Hero />
 				{/* <Stats /> */}
 				<BoardMembers />
+				<Testimonials />
 				<Events />
 				{/* <Newsletter /> */}
 				<FAQ />
-				{/* <ContactForm /> */}
+				<CTA />
+				<ContactForm />
 			</main>
 			<Footer />
 		</>

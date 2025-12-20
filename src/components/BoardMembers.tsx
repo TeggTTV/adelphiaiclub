@@ -134,19 +134,21 @@ const BoardMembers = () => {
 	return (
 		<section
 			id="board"
-			className="w-full relative py-16 sm:py-20 md:py-24 bg-black min-h-screen flex items-center overflow-hidden"
+			className="w-full relative py-20 sm:py-32 bg-transparent min-h-screen flex items-center overflow-hidden"
 		>
 			{/* Animated Background Grid */}
-			<div className="absolute inset-0 opacity-10">
-				<div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5" />
+			<div className="absolute inset-0 opacity-20">
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent" />
 				<div
 					className="absolute inset-0"
 					style={{
 						backgroundImage: `
-							linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-							linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+							linear-gradient(rgba(59, 130, 246, 0.15) 1px, transparent 1px),
+							linear-gradient(90deg, rgba(59, 130, 246, 0.15) 1px, transparent 1px)
 						`,
-						backgroundSize: '50px 50px',
+						backgroundSize: '40px 40px',
+						maskImage:
+							'radial-gradient(circle at center, black 40%, transparent 100%)',
 						animation:
 							'gridMove 20s ease-in-out infinite alternate',
 					}}
@@ -158,14 +160,17 @@ const BoardMembers = () => {
 				<Particles />
 			</div>
 
-			<div className="w-full container mx-auto px-4 sm:px-6 relative z-10">
+			<div className="w-full max-w-7xl container mx-auto px-4 sm:px-6 relative z-10">
 				<motion.h2
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.5 }}
-					className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-3 sm:mb-4"
+					className="text-4xl sm:text-5xl md:text-6xl font-bold text-white text-center mb-6 tracking-tight"
 				>
-					Meet Our Board
+					Meet Our{' '}
+					<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+						Board
+					</span>
 				</motion.h2>
 
 				<motion.p
@@ -396,7 +401,7 @@ const BoardMembers = () => {
 					{boardMembers.map((member, index) => (
 						<motion.div
 							key={member.name}
-							className="bg-white/5 backdrop-blur-md rounded-xl p-6 xl:p-8 2xl:p-10 border border-white/10 shadow-lg hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group flex flex-col"
+							className="glass rounded-xl p-6 xl:p-8 2xl:p-10 shadow-lg hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group flex flex-col"
 							variants={{
 								hidden: {
 									opacity: 0,

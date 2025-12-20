@@ -8,15 +8,7 @@ interface OrbProps {
 	forceHoverState?: boolean;
 }
 
-export default function Orb({
-	hue = 0,
-	hoverIntensity = 0.2,
-	rotateOnHover = true,
-	forceHoverState = false,
-}: OrbProps) {
-	const ctnDom = useRef<HTMLDivElement>(null);
-
-	const vert = /* glsl */ `
+const vert = /* glsl */ `
     precision highp float;
     attribute vec2 position;
     attribute vec2 uv;
@@ -27,9 +19,9 @@ export default function Orb({
     }
   `;
 
-	const frag = /* glsl */ `
+const frag = /* glsl */ `
     precision highp float;
-
+    
     uniform float iTime;
     uniform vec3 iResolution;
     uniform float hue;
@@ -175,6 +167,15 @@ export default function Orb({
     }
   `;
 
+export default function Orb({
+	hue = 0,
+	hoverIntensity = 0.2,
+	rotateOnHover = true,
+	forceHoverState = false,
+}: OrbProps) {
+	const ctnDom = useRef<HTMLDivElement>(null);
+
+	// Shaders moved outside component
 	useEffect(() => {
 		const container = ctnDom.current;
 		if (!container) return;
