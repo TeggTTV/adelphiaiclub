@@ -117,19 +117,9 @@ const Footer = () => {
 							},
 							{
 								icon: FaInstagram,
-								href: 'https://instagram.com/adelphiaisociety',
+								href: 'https://instagram.com/adelphiaisociety_',
 								label: 'Instagram',
 							},
-							{
-								icon: FaLinkedin,
-								href: 'https://linkedin.com/company/adelphiaisociety',
-								label: 'LinkedIn',
-							},
-							// {
-							// 	icon: FaEnvelope,
-							// 	href: 'mailto:aiclub@adelphi.edu',
-							// 	label: 'Email',
-							// },
 						].map((social, index) => (
 							<motion.a
 								key={social.label}
@@ -192,7 +182,8 @@ const Footer = () => {
 									Meeting Room
 								</h3>
 								<p className="text-white/70 text-xs sm:text-sm">
-									Science Building, Room 409
+									Check our IG for updates on our meeting
+									location
 								</p>
 							</div>
 						</div>

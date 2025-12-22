@@ -103,10 +103,10 @@ const ContactForm = () => {
 							Prefer email?
 						</p>
 						<a
-							href="mailto:aiclub@adelphi.edu"
+							href="mailto:aisociety@adelphi.edu"
 							className="text-blue-400 hover:text-blue-300 transition-colors duration-300 text-sm sm:text-base font-medium"
 						>
-							aiclub@adelphi.edu
+							aisociety@adelphi.edu
 						</a>
 					</motion.div>
 				</div>
