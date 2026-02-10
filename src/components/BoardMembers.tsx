@@ -85,13 +85,13 @@ const boardMembers = [
 			'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
 		instagram: 'https://instagram.com/mikecankindacook', // Replace with actual Instagram handle
 	},
-	// {
-	// 	name: 'Ann-lyse Joseph',
-	// 	role: 'Secretary',
-	// 	description:
-	// 		'Health Science major documenting our journey and coordinating club activities. Interested in AI applications in healthcare and wellness.',
-	// 	instagram: 'https://instagram.com/annlysejoseph', // Replace with actual Instagram handle
-	// },
+	{
+		name: 'Adam Kalantarov',
+		role: 'Secretary',
+		description:
+			'Nursing major learning about AI in medicine. Keeps things organized and communication flowing.',
+		instagram: 'https://instagram.com/', // Replace with actual Instagram handle
+	},
 ];
 
 const BoardMembers = () => {
@@ -120,7 +120,7 @@ const BoardMembers = () => {
 	const prevMember = () => {
 		setDirection(-1);
 		setCurrentIndex(
-			(prev) => (prev - 1 + boardMembers.length) % boardMembers.length
+			(prev) => (prev - 1 + boardMembers.length) % boardMembers.length,
 		);
 		setAutoPlay(false);
 	};
@@ -383,7 +383,7 @@ const BoardMembers = () => {
 
 				{/* Desktop Grid (hidden on mobile/tablet) */}
 				<motion.div
-					className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-6 xl:gap-8"
+					className="hidden lg:grid lg:grid-cols-2 xl:grid-cols-5 gap-6 xl:gap-8"
 					initial="hidden"
 					whileInView="visible"
 					viewport={{ once: true, amount: 0.1 }}

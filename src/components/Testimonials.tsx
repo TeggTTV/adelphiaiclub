@@ -7,15 +7,15 @@ import SectionBackground from './SectionBackground';
 const testimonials = [
 	{
 		id: 1,
-		name: 'Alex Johnson',
-		role: 'Computer Science Student',
-		quote: "Joining the AI Society was the best decision I made. The workshops gave me hands-on experience that classes didn't offer.",
+		name: 'Nataly Gutierrez',
+		role: 'Member',
+		quote: 'The AI Society club is an innovative and engaging group at our school, offering a fantastic opportunity to dive into artificial intelligence. Overall, the AI Society club equips students with essential skills for the future and sparks a passion for technology and innovation.',
 	},
 	{
 		id: 2,
-		name: 'Sarah Lee',
-		role: 'Alumni',
-		quote: 'The networking opportunities are incredible. I landed my first internship through a connection I made at a club event.',
+		name: 'Dimitri Moutopoulos',
+		role: 'Member',
+		quote: 'Having an AI club is simple but valuable—a place to learn, question, and figure things out as technology keeps evolving.',
 	},
 	{
 		id: 3,
@@ -55,9 +55,9 @@ const Testimonials = () => {
 							transition={{ delay: index * 0.1 }}
 							className="glass p-8 rounded-2xl border border-white/10 hover:border-blue-500/30 transition-all duration-300 flex flex-col items-center text-center"
 						>
-							<div className="w-20 h-20 mb-6 rounded-full overflow-hidden">
+							{/* <div className="w-20 h-20 mb-6 rounded-full overflow-hidden">
 								<PlaceholderImage text="User" />
-							</div>
+							</div> */}
 							<p className="text-gray-300 italic mb-6">
 								&quot;{testimonial.quote}&quot;
 							</p>

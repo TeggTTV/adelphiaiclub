@@ -63,7 +63,7 @@ const FAQ = () => {
 		},
 		{
 			question: "What's the time commitment?",
-			answer: "We're flexible! We typically host 2-3 events per month, including workshops, guest speakers, and social gatherings. You can participate as much or as little as you'd like. There's no pressure to attend every event—come to what interests you and fits your schedule.",
+			answer: "We're flexible! We typically host 2-3 events per semester, including workshops, guest speakers, and social gatherings. You can participate as much or as little as you'd like. There's no pressure to attend every event—come to what interests you and fits your schedule.",
 		},
 		{
 			question: 'What majors are club members?',
@@ -75,7 +75,7 @@ const FAQ = () => {
 		},
 		{
 			question: 'How can I get more involved?',
-			answer: "There are many ways to get involved beyond attending events! You can join our project teams, help organize events, contribute to our blog, become a workshop instructor, or apply for a board position. We're always looking for enthusiastic members who want to help grow our community.",
+			answer: "There are many ways to get involved beyond attending events! You can join our project teams, help organize events, contribute to our blog, or apply for a board position. We're always looking for enthusiastic members who want to help grow our community.",
 		},
 		{
 			question:

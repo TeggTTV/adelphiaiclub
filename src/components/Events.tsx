@@ -4,31 +4,31 @@ import { motion } from 'framer-motion';
 
 const upcomingEvents = [
 	{
-		title: 'Introduction to Machine Learning Workshop',
-		date: 'Sept 15, 2025',
-		time: '2:00 PM - 4:00 PM',
-		location: 'Science Building Room 301',
+		title: 'AI X Nursing',
+		date: 'TBD',
+		time: 'TBD',
+		location: 'TBD',
 		description:
-			"Join us for a hands-on workshop where we'll explore the basics of machine learning using Python and scikit-learn.",
+			'Experience nursing education like never before with AI-powered simulations and interactive learning.',
 		type: 'Workshop',
 	},
 	{
-		title: 'AI in Healthcare Guest Speaker',
-		date: 'Sept 22, 2025',
-		time: '4:00 PM - 5:30 PM',
-		location: 'Performing Arts Center',
+		title: 'AI Hackathon',
+		date: 'April',
+		time: 'TBD',
+		location: 'TBD',
 		description:
-			'Distinguished speaker Dr. Sarah Chen discusses the revolutionary impact of AI in modern healthcare.',
-		type: 'Speaker',
+			"The first hackathon where coding isn't a barrier. Open to the entire campus—creativity and innovation take center stage.",
+		type: 'Competition',
 	},
 	{
-		title: 'Hackathon: Build Your First AI Model',
-		date: 'Oct 1, 2025',
-		time: '1:00 PM - 6:00 PM',
-		location: 'Innovation Lab',
+		title: 'Surprise Guest Speaker',
+		date: 'TBD',
+		time: 'TBD',
+		location: 'TBD',
 		description:
-			"A beginner-friendly hackathon where you'll build and train your first AI model. Prizes for top projects!",
-		type: 'Competition',
+			'Experienced leadership helping students navigate the rapid evolution of AI and its impact on our world.',
+		type: 'Speaker',
 	},
 ];
 
@@ -266,7 +266,7 @@ const Events = () => {
 										<div className="md:hidden mt-4">
 											<div
 												className={`inline-block px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r ${getEventTypeColor(
-													event.type
+													event.type,
 												)} shadow-lg`}
 											>
 												{event.type}
@@ -286,7 +286,7 @@ const Events = () => {
 									>
 										<div
 											className={`inline-block px-6 py-3 rounded-full text-base font-semibold text-white mb-4 bg-gradient-to-r ${getEventTypeColor(
-												event.type
+												event.type,
 											)} shadow-lg`}
 										>
 											{event.type}
