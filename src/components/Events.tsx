@@ -4,31 +4,31 @@ import { motion } from 'framer-motion';
 
 const upcomingEvents = [
 	{
-		title: 'AI X Nursing',
-		date: 'TBD',
-		time: 'TBD',
+		title: 'AI Debate',
+		date: 'April 15',
+		time: '1:30pm - 2:30pm',
 		location: 'TBD',
 		description:
-			'Experience nursing education like never before with AI-powered simulations and interactive learning.',
+			'Put a controversial or interesting topic on the board and start the conversation—others will jump in! Light snacks like cookies and water. (Week of April 13th-17th, replaces regular meeting that week.)',
+		type: 'Event',
+	},
+	{
+		title: 'AlphaFold Workshop',
+		date: 'April 15',
+		time: '6:00pm',
+		location: 'UC 213/214',
+		description:
+			'Hands-on workshop exploring AlphaFold and its impact on protein structure prediction. Open to all skill levels.',
 		type: 'Workshop',
 	},
 	{
 		title: 'AI Hackathon',
-		date: 'April',
-		time: 'TBD',
-		location: 'TBD',
+		date: 'April 29',
+		time: '5:45pm - 6:30pm',
+		location: 'UC or Innovation Center',
 		description:
-			"The first hackathon where coding isn't a barrier. Open to the entire campus—creativity and innovation take center stage.",
+			'First AI coding hackathon! Use an AI-powered IDE, multiple winners, food (pizza), and prizes (Amazon gift card, AI subscription). Bring your own device or borrow a Chromebook. Topic revealed at the start.',
 		type: 'Competition',
-	},
-	{
-		title: 'Surprise Guest Speaker',
-		date: 'TBD',
-		time: 'TBD',
-		location: 'TBD',
-		description:
-			'Experienced leadership helping students navigate the rapid evolution of AI and its impact on our world.',
-		type: 'Speaker',
 	},
 ];
 
