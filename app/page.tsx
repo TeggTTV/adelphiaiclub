@@ -138,7 +138,7 @@ export default function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[color:var(--primary)] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[color:var(--primary)]"></span>
             </span>
-            Adelphi University's Premier Tech Organization
+              Adelphi University&apos;s Premier Tech Organization
           </motion.div>
 
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter max-w-4xl leading-tight">
@@ -173,7 +173,7 @@ export default function Home() {
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[color:var(--primary)] to-transparent opacity-50" />
             <h2 className="text-2xl md:text-3xl font-bold mb-6">Shaping the Future Together</h2>
             <p className="text-lg text-[color:var(--muted-foreground)] mb-8 leading-relaxed">
-              The Adelphi AI Society is dedicated to demystifying artificial intelligence and providing students with hands-on experience in machine learning, data science, and software engineering. Whether you're a beginner or an expert, there's a place for you here.
+              The Adelphi AI Society is dedicated to demystifying artificial intelligence and providing students with hands-on experience in machine learning, data science, and software engineering. Whether you&apos;re a beginner or an expert, there&apos;s a place for you here.
             </p>
             <Link href="/about" className="inline-flex items-center gap-2 text-[color:var(--primary)] font-bold hover:underline underline-offset-4">
               Learn More About Us <ChevronRight className="w-4 h-4" />
@@ -188,7 +188,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">Upcoming Events</h2>
-              <p className="text-[color:var(--muted-foreground)]">Don't miss out on our latest workshops and meetups.</p>
+              <p className="text-[color:var(--muted-foreground)]">Don&apos;t miss out on our latest workshops and meetups.</p>
             </div>
             <Link href="/events" className="inline-flex items-center gap-2 text-[color:var(--primary)] font-bold hover:underline underline-offset-4">
               View All Events <ArrowRight className="w-4 h-4" />

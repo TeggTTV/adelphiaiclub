@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Particles from './bits/Particles';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 
 const AvatarSVG = ({
 	initial,
@@ -11,9 +11,8 @@ const AvatarSVG = ({
 	initial: string;
 	context?: string;
 }) => {
-	const gradientId = `gradient-${initial}-${context}-${Math.random()
-		.toString(36)
-		.substr(2, 9)}`;
+	const uniqueId = useId();
+	const gradientId = `gradient-${initial}-${context}-${uniqueId.replace(/:/g, '')}`;
 
 	return (
 		<svg

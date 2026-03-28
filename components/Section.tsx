@@ -1,13 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { motion } from "motion/react"
+import { motion, type HTMLMotionProps } from "motion/react"
 import { cn } from "./Navbar"
 
-interface SectionProps extends React.HTMLAttributes<HTMLElement> {
+interface SectionProps extends Omit<HTMLMotionProps<"section">, "children"> {
   children: React.ReactNode
   delay?: number
-  className?: string
 }
 
 export function Section({ children, delay = 0, className, ...props }: SectionProps) {

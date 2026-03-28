@@ -59,7 +59,7 @@ export default function ContactPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-[color:var(--muted-foreground)] max-w-3xl mx-auto leading-relaxed"
           >
-            Have a question, want to collaborate, or just want to say hi? We'd love to hear from you.
+            Have a question, want to collaborate, or just want to say hi? We&apos;d love to hear from you.
           </motion.p>
         </div>
       </section>

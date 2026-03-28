@@ -120,7 +120,7 @@ export default function BlogAdminPage() {
               transition={{ delay: 0.1 }}
               className="text-[color:var(--muted-foreground)]"
             >
-              Manage your society's publications.
+              Manage your society&apos;s publications.
             </motion.p>
           </div>
           
