@@ -93,6 +93,27 @@ type ProjectRecord = {
   liveUrl: string | null
 }
 
+type BlogEditForm = {
+  title: string
+  excerpt: string
+  content: string
+  tags: string
+}
+
+type ProjectEditForm = {
+  title: string
+  description: string
+  techStack: string
+  tags: string
+  creators: string
+  projectState: string
+  difficulty: string
+  semester: string
+  impact: string
+  githubUrl: string
+  liveUrl: string
+}
+
 type PasskeyStatus = {
   configured: boolean
   source: "database" | "env_hash" | "env_plain" | "none"
@@ -146,6 +167,27 @@ export default function DashboardPage() {
   const [rejectedProjects, setRejectedProjects] = React.useState<ProjectRecord[]>([])
   const [previewPost, setPreviewPost] = React.useState<BlogPostRecord | null>(null)
   const [previewProject, setPreviewProject] = React.useState<ProjectRecord | null>(null)
+  const [editingPost, setEditingPost] = React.useState<BlogPostRecord | null>(null)
+  const [editingProject, setEditingProject] = React.useState<ProjectRecord | null>(null)
+  const [blogEditForm, setBlogEditForm] = React.useState<BlogEditForm>({
+    title: "",
+    excerpt: "",
+    content: "",
+    tags: "",
+  })
+  const [projectEditForm, setProjectEditForm] = React.useState<ProjectEditForm>({
+    title: "",
+    description: "",
+    techStack: "",
+    tags: "",
+    creators: "",
+    projectState: "",
+    difficulty: "",
+    semester: "",
+    impact: "",
+    githubUrl: "",
+    liveUrl: "",
+  })
   const [passkeyStatus, setPasskeyStatus] = React.useState<PasskeyStatus>(emptyPasskeyStatus)
 
   const [loading, setLoading] = React.useState(true)
@@ -575,35 +617,52 @@ export default function DashboardPage() {
     }
   }
 
-  const editBlogPost = async (post: BlogPostRecord) => {
-    const title = window.prompt("Edit post title", post.title)
-    if (title === null) return
+  const editBlogPost = (post: BlogPostRecord) => {
+    setError("")
+    setMessage("")
+    setEditingPost(post)
+    setBlogEditForm({
+      title: post.title,
+      excerpt: post.excerpt || "",
+      content: post.content || "",
+      tags: post.tags.join(", "),
+    })
+  }
 
-    const excerpt = window.prompt("Edit excerpt", post.excerpt || "")
-    if (excerpt === null) return
+  const saveBlogPostEdits = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const content = window.prompt("Edit content", post.content || "")
-    if (content === null) return
+    if (!editingPost) return
 
-    const tagsInput = window.prompt("Edit tags (comma separated)", post.tags.join(", "))
-    if (tagsInput === null) return
+    const title = blogEditForm.title.trim()
+    const content = blogEditForm.content.trim()
+
+    if (!title) {
+      setError("Post title is required")
+      return
+    }
+
+    if (!content) {
+      setError("Post content is required")
+      return
+    }
 
     setMessage("")
     setError("")
-    setUpdatingApproved((state) => ({ ...state, [post.id]: true }))
+    setUpdatingApproved((state) => ({ ...state, [editingPost.id]: true }))
 
     try {
-      const response = await fetch(`/api/blog/posts/${post.id}`, {
+      const response = await fetch(`/api/blog/posts/${editingPost.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
         body: JSON.stringify({
-          title: title.trim(),
-          excerpt: excerpt.trim(),
+          title,
+          excerpt: blogEditForm.excerpt.trim(),
           content,
-          tags: tagsInput,
+          tags: blogEditForm.tags,
         }),
       })
 
@@ -613,12 +672,13 @@ export default function DashboardPage() {
         return
       }
 
+      setEditingPost(null)
       setMessage("Post updated")
       await load()
     } catch {
       setError("Unable to edit post")
     } finally {
-      setUpdatingApproved((state) => ({ ...state, [post.id]: false }))
+      setUpdatingApproved((state) => ({ ...state, [editingPost.id]: false }))
     }
   }
 
@@ -744,39 +804,66 @@ export default function DashboardPage() {
     }
   }
 
-  const editProject = async (project: ProjectRecord) => {
-    const title = window.prompt("Edit project title", project.title)
-    if (title === null) return
+  const editProject = (project: ProjectRecord) => {
+    setError("")
+    setMessage("")
+    setEditingProject(project)
+    setProjectEditForm({
+      title: project.title,
+      description: project.description || "",
+      techStack: project.techStack.join(", "),
+      tags: project.tags.join(", "),
+      creators: project.creators.join(", "),
+      projectState: project.projectState || "",
+      difficulty: project.difficulty || "",
+      semester: project.semester || "",
+      impact: project.impact || "",
+      githubUrl: project.githubUrl || "",
+      liveUrl: project.liveUrl || "",
+    })
+  }
 
-    const description = window.prompt("Edit project description", project.description)
-    if (description === null) return
+  const saveProjectEdits = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
 
-    const techStack = window.prompt("Edit tech stack (comma separated)", project.techStack.join(", "))
-    if (techStack === null) return
+    if (!editingProject) return
 
-    const tags = window.prompt("Edit tags (comma separated)", project.tags.join(", "))
-    if (tags === null) return
+    const title = projectEditForm.title.trim()
+    const description = projectEditForm.description.trim()
 
-    const creators = window.prompt("Edit creators (comma separated)", project.creators.join(", "))
-    if (creators === null) return
+    if (!title) {
+      setError("Project title is required")
+      return
+    }
+
+    if (!description) {
+      setError("Project description is required")
+      return
+    }
 
     setMessage("")
     setError("")
-    setUpdatingApproved((state) => ({ ...state, [project.id]: true }))
+    setUpdatingApproved((state) => ({ ...state, [editingProject.id]: true }))
 
     try {
-      const response = await fetch(`/api/projects/${project.id}`, {
+      const response = await fetch(`/api/projects/${editingProject.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
         body: JSON.stringify({
-          title: title.trim(),
+          title,
           description,
-          techStack,
-          tags,
-          creators,
+          techStack: projectEditForm.techStack,
+          tags: projectEditForm.tags,
+          creators: projectEditForm.creators,
+          projectState: projectEditForm.projectState.trim(),
+          difficulty: projectEditForm.difficulty.trim(),
+          semester: projectEditForm.semester.trim(),
+          impact: projectEditForm.impact.trim(),
+          githubUrl: projectEditForm.githubUrl.trim(),
+          liveUrl: projectEditForm.liveUrl.trim(),
         }),
       })
 
@@ -786,12 +873,13 @@ export default function DashboardPage() {
         return
       }
 
+      setEditingProject(null)
       setMessage("Project updated")
       await load()
     } catch {
       setError("Unable to edit project")
     } finally {
-      setUpdatingApproved((state) => ({ ...state, [project.id]: false }))
+      setUpdatingApproved((state) => ({ ...state, [editingProject.id]: false }))
     }
   }
 
@@ -996,8 +1084,8 @@ export default function DashboardPage() {
         <StatCard label="Pending Projects" value={String(pendingProjectQueue.length)} />
         <StatCard label="Approved Blogs" value={String(approvedPosts.length)} />
         <StatCard label="Approved Projects" value={String(approvedProjects.length)} />
-        <StatCard label="Rejected Blogs" value={String(rejectedPosts.length)} />
-        <StatCard label="Rejected Projects" value={String(rejectedProjects.length)} />
+        {/* <StatCard label="Rejected Blogs" value={String(rejectedPosts.length)} />
+        <StatCard label="Rejected Projects" value={String(rejectedProjects.length)} /> */}
         <StatCard label="Files" value={String(files.length)} />
       </div>
 
@@ -1461,7 +1549,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-4 text-2xl font-bold">Rejected Blogs (Monitored)</h2>
+        <h2 className="mb-4 text-2xl font-bold">Rejected Blogs</h2>
         <div className="glass overflow-hidden rounded-2xl border border-[color:var(--border)]">
           {rejectedPosts.length === 0 ? (
             <p className="p-5 text-sm text-[color:var(--muted-foreground)]">No rejected blog posts.</p>
@@ -1519,7 +1607,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-4 text-2xl font-bold">Rejected Projects (Monitored)</h2>
+        <h2 className="mb-4 text-2xl font-bold">Rejected Projects</h2>
         <div className="glass overflow-hidden rounded-2xl border border-[color:var(--border)]">
           {rejectedProjects.length === 0 ? (
             <p className="p-5 text-sm text-[color:var(--muted-foreground)]">No rejected projects.</p>
@@ -1608,6 +1696,219 @@ export default function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {editingPost ? (
+        <PreviewModal
+          title="Edit Blog Post"
+          subtitle={`By ${editingPost.authorName}`}
+          onClose={() => setEditingPost(null)}
+        >
+          <form onSubmit={saveBlogPostEdits} className="space-y-3">
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                Title
+              </label>
+              <input
+                value={blogEditForm.title}
+                onChange={(event) => setBlogEditForm((current) => ({ ...current, title: event.target.value }))}
+                className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                Excerpt
+              </label>
+              <textarea
+                value={blogEditForm.excerpt}
+                onChange={(event) => setBlogEditForm((current) => ({ ...current, excerpt: event.target.value }))}
+                rows={3}
+                className="w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                Content
+              </label>
+              <textarea
+                value={blogEditForm.content}
+                onChange={(event) => setBlogEditForm((current) => ({ ...current, content: event.target.value }))}
+                rows={10}
+                className="w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 py-2 text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                Tags (comma separated)
+              </label>
+              <input
+                value={blogEditForm.tags}
+                onChange={(event) => setBlogEditForm((current) => ({ ...current, tags: event.target.value }))}
+                className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+              />
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingPost(null)}
+                className="rounded-full border border-[color:var(--border)] px-4 py-2 text-xs font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={Boolean(updatingApproved[editingPost.id])}
+                className="rounded-full bg-[color:var(--primary)] px-4 py-2 text-xs font-bold text-[color:var(--primary-foreground)] disabled:opacity-60"
+              >
+                {updatingApproved[editingPost.id] ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </form>
+        </PreviewModal>
+      ) : null}
+
+      {editingProject ? (
+        <PreviewModal
+          title="Edit Project"
+          subtitle={`By ${editingProject.submittedByName}`}
+          onClose={() => setEditingProject(null)}
+        >
+          <form onSubmit={saveProjectEdits} className="space-y-3">
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                Title
+              </label>
+              <input
+                value={projectEditForm.title}
+                onChange={(event) => setProjectEditForm((current) => ({ ...current, title: event.target.value }))}
+                className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                required
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                Description
+              </label>
+              <textarea
+                value={projectEditForm.description}
+                onChange={(event) => setProjectEditForm((current) => ({ ...current, description: event.target.value }))}
+                rows={7}
+                className="w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 py-2 text-sm"
+                required
+              />
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  Tech Stack (comma separated)
+                </label>
+                <input
+                  value={projectEditForm.techStack}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, techStack: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  Tags (comma separated)
+                </label>
+                <input
+                  value={projectEditForm.tags}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, tags: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  Creators (comma separated)
+                </label>
+                <input
+                  value={projectEditForm.creators}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, creators: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  Project State
+                </label>
+                <input
+                  value={projectEditForm.projectState}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, projectState: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  Difficulty
+                </label>
+                <input
+                  value={projectEditForm.difficulty}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, difficulty: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  Semester
+                </label>
+                <input
+                  value={projectEditForm.semester}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, semester: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  Impact
+                </label>
+                <input
+                  value={projectEditForm.impact}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, impact: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  GitHub URL
+                </label>
+                <input
+                  value={projectEditForm.githubUrl}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, githubUrl: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
+                  Live Demo URL
+                </label>
+                <input
+                  value={projectEditForm.liveUrl}
+                  onChange={(event) => setProjectEditForm((current) => ({ ...current, liveUrl: event.target.value }))}
+                  className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingProject(null)}
+                className="rounded-full border border-[color:var(--border)] px-4 py-2 text-xs font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={Boolean(updatingApproved[editingProject.id])}
+                className="rounded-full bg-[color:var(--primary)] px-4 py-2 text-xs font-bold text-[color:var(--primary-foreground)] disabled:opacity-60"
+              >
+                {updatingApproved[editingProject.id] ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </form>
+        </PreviewModal>
+      ) : null}
 
       {previewPost ? (
         <PreviewModal title={previewPost.title} subtitle={`By ${previewPost.authorName}`} onClose={() => setPreviewPost(null)}>
