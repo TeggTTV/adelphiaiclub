@@ -3,91 +3,192 @@
 import * as React from "react"
 import Link from "next/link"
 import { motion } from "motion/react"
-import { Section } from "@/components/Section"
-import { blogPosts } from "@/lib/data"
-import { format } from "date-fns"
-import { ArrowRight, Calendar, User } from "lucide-react"
+import { ArrowRight, BookOpen, Calendar, MessageSquare, Search, Sparkles } from "lucide-react"
+
+type BlogPost = {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  createdAt: string
+  authorName: string
+  tags: string[]
+}
+
+const BlogDisclaimer = () => (
+  <p className="mt-12 text-center text-sm text-[color:var(--muted-foreground)] opacity-70">
+    Some club posts may include AI-assisted drafting.
+  </p>
+)
 
 export default function BlogPage() {
-  return (
-    <div className="flex flex-col min-h-screen">
-      <section className="py-24 md:py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--color-primary)_0%,transparent_50%)] opacity-10 blur-[100px]" />
-        <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-black tracking-tighter mb-6"
-          >
-            The <span className="text-gradient">Blog</span>
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-xl text-[color:var(--muted-foreground)] max-w-3xl mx-auto leading-relaxed"
-          >
-            Insights, tutorials, and updates from the Adelphi AI Society.
-          </motion.p>
-        </div>
-      </section>
+  const [searchTerm, setSearchTerm] = React.useState("")
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState("")
+  const [posts, setPosts] = React.useState<BlogPost[]>([])
 
-      <Section className="bg-[color:var(--muted)]/30">
-        <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-          <div className="space-y-8">
-            {blogPosts.filter(post => post.published).map((post, i) => (
+  React.useEffect(() => {
+    fetch("/api/blog/posts", { credentials: "include" })
+      .then((response) => response.json())
+      .then((data) => {
+        setPosts(data.posts || [])
+      })
+      .catch(() => setError("Unable to load blog posts"))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const featuredPost = posts[0]
+
+  const filteredPosts = posts.filter((post) => {
+    const query = searchTerm.trim().toLowerCase()
+    if (!query) return true
+
+    const text = [post.title, post.excerpt || "", post.authorName, ...post.tags].join(" ").toLowerCase()
+    return text.includes(query)
+  })
+
+  const otherPosts = filteredPosts.filter((post) => post.id !== featuredPost?.id)
+
+  return (
+    <section className="relative min-h-screen overflow-hidden px-4 py-16 sm:px-6 md:px-8">
+      <div className="absolute right-0 top-0 -z-10 h-[540px] w-[540px] rounded-full bg-gradient-to-bl from-[color:var(--primary)]/20 via-cyan-500/10 to-transparent blur-3xl" />
+      <div className="absolute bottom-0 left-0 -z-10 h-[460px] w-[460px] rounded-full bg-gradient-to-tr from-emerald-500/15 via-blue-500/10 to-transparent blur-3xl" />
+
+      <motion.div
+        className="mx-auto mb-14 max-w-3xl text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <motion.span
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--card)] px-4 py-1.5 text-sm font-semibold text-[color:var(--primary)]"
+        >
+          <BookOpen className="h-4 w-4" />
+          Club Insights
+        </motion.span>
+
+        <h1 className="text-4xl font-black tracking-tight md:text-6xl">
+          The <span className="text-gradient">Blog</span>
+        </h1>
+        <p className="mt-5 text-lg text-[color:var(--muted-foreground)]">
+          Tutorials, event recaps, and AI project notes from Adelphi AI Society members.
+        </p>
+
+        <div className="mx-auto mt-8 max-w-xl">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--muted-foreground)]" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search posts..."
+              className="h-12 w-full rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] pl-10 pr-4 text-sm outline-none transition focus:border-[color:var(--primary)]"
+            />
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/blog/submit"
+            className="inline-flex h-10 items-center rounded-full bg-[color:var(--primary)] px-5 text-sm font-bold text-[color:var(--primary-foreground)]"
+          >
+            Submit an Article
+          </Link>
+        </div>
+      </motion.div>
+
+      <div className="mx-auto max-w-7xl">
+        {loading && <p className="text-center text-[color:var(--muted-foreground)]">Loading blog posts...</p>}
+        {error && <p className="text-center text-red-400">{error}</p>}
+
+        {!loading && featuredPost && filteredPosts.length > 0 && (
+          <motion.article className="group relative mb-14" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-[color:var(--primary)] via-cyan-500 to-emerald-500 opacity-20 blur transition-opacity duration-500 group-hover:opacity-40" />
+            <div className="relative overflow-hidden rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-8 md:p-10">
+              <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--primary)] px-3 py-1 font-bold text-[color:var(--primary-foreground)]">
+                  <Sparkles className="h-3.5 w-3.5" /> Featured
+                </span>
+                <span className="rounded-full border border-[color:var(--border)] px-3 py-1 text-[color:var(--muted-foreground)]">
+                  <span className="inline-flex items-center gap-1">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {new Date(featuredPost.createdAt).toLocaleDateString()}
+                  </span>
+                </span>
+              </div>
+
+              <h2 className="text-3xl font-black tracking-tight md:text-4xl">
+                <Link href={`/blog/${featuredPost.slug}`} className="transition-colors hover:text-[color:var(--primary)]">
+                  {featuredPost.title}
+                </Link>
+              </h2>
+              <p className="mt-4 max-w-3xl text-[color:var(--muted-foreground)]">
+                {featuredPost.excerpt || "Read the latest article from the club."}
+              </p>
+
+              <Link
+                href={`/blog/${featuredPost.slug}`}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[color:var(--primary)] px-5 py-2.5 text-sm font-bold text-[color:var(--primary-foreground)]"
+              >
+                Read Article
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </motion.article>
+        )}
+
+        {!loading && filteredPosts.length > 0 && (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {otherPosts.map((post, index) => (
               <motion.article
                 key={post.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass rounded-3xl p-8 md:p-10 group hover:border-[color:var(--primary)] transition-colors relative overflow-hidden"
+                transition={{ delay: index * 0.05 }}
+                className="group overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)]"
               >
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-transparent via-[color:var(--primary)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                
-                <div className="flex flex-wrap items-center gap-4 text-sm text-[color:var(--muted-foreground)] mb-6">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-[color:var(--primary)]" />
-                    {format(post.createdAt, "MMMM d, yyyy")}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-[color:var(--primary)]" />
-                    {post.author}
-                  </div>
-                </div>
-                
-                <h2 className="text-3xl font-bold mb-4 group-hover:text-[color:var(--primary)] transition-colors">
-                  <Link href={`/blog/${post.slug}`}>
-                    {post.title}
-                  </Link>
-                </h2>
-                
-                <p className="text-lg text-[color:var(--muted-foreground)] mb-8 leading-relaxed">
-                  {post.excerpt}
-                </p>
-                
-                <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map(tag => (
-                      <span key={tag} className="text-xs font-medium px-3 py-1 rounded-full bg-[color:var(--background)] border border-[color:var(--border)] text-[color:var(--primary)]">
+                <div className="h-1 bg-gradient-to-r from-[color:var(--primary)] via-cyan-500 to-emerald-500 opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="p-5">
+                  <p className="mb-3 text-xs text-[color:var(--muted-foreground)]">
+                    {new Date(post.createdAt).toLocaleDateString()} • {post.authorName}
+                  </p>
+                  <h3 className="line-clamp-2 text-xl font-bold">
+                    <Link href={`/blog/${post.slug}`} className="transition-colors hover:text-[color:var(--primary)]">
+                      {post.title}
+                    </Link>
+                  </h3>
+                  <p className="mt-3 line-clamp-3 text-sm text-[color:var(--muted-foreground)]">{post.excerpt || "No excerpt."}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {post.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2 py-0.5 text-xs text-[color:var(--primary)]">
                         {tag}
                       </span>
                     ))}
                   </div>
-                  
-                  <Link 
+                  <Link
                     href={`/blog/${post.slug}`}
-                    className="inline-flex items-center gap-2 text-[color:var(--primary)] font-bold hover:underline underline-offset-4"
+                    className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[color:var(--primary)]"
                   >
-                    Read More <ArrowRight className="w-4 h-4" />
+                    Read more <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
               </motion.article>
             ))}
           </div>
-        </div>
-      </Section>
-    </div>
+        )}
+
+        {!loading && filteredPosts.length === 0 && (
+          <div className="py-20 text-center">
+            <MessageSquare className="mx-auto mb-3 h-16 w-16 text-[color:var(--muted-foreground)] opacity-40" />
+            <h3 className="text-2xl font-bold">No blog posts found</h3>
+            <p className="mt-2 text-[color:var(--muted-foreground)]">Try a different search or submit a new article.</p>
+          </div>
+        )}
+
+        <BlogDisclaimer />
+      </div>
+    </section>
   )
 }

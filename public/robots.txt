@@ -5,7 +5,8 @@ Disallow: /404
 Disallow: /500
 Disallow: /api/*
 Disallow: /_next/*
-Disallow: /admin/*
+Disallow: /blog/admin
+Disallow: /blog/admin/*
 
 # GPTBot
 User-agent: GPTBot
@@ -32,4 +33,3 @@ Host: https://adelphiaisociety.vercel.app
 
 # Sitemaps
 Sitemap: https://adelphiaisociety.vercel.app/sitemap.xml
-Sitemap: https://adelphiaisociety.vercel.app/server-sitemap.xml

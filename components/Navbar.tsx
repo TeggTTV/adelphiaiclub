@@ -5,10 +5,11 @@ import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useTheme } from "next-themes"
-import { Menu, X, Moon, Sun, ChevronDown } from "lucide-react"
+import { Menu, X, Moon, Sun, ChevronDown, LogOut } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { notifyAuthChanged, useAuthUser } from "@/hooks/use-auth-user"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -40,6 +41,7 @@ export function Navbar() {
   const desktopMenuRef = React.useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
+  const { user, refresh } = useAuthUser()
 
   const isMoreActive = moreLinks.some((link) => pathname === link.href)
 
@@ -81,6 +83,18 @@ export function Navbar() {
     setIsDesktopMenuOpen(false)
     setIsMobileMenuOpen(false)
   }, [pathname])
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    }).catch(() => null)
+
+    await refresh()
+    notifyAuthChanged()
+    setIsMobileMenuOpen(false)
+    setIsDesktopMenuOpen(false)
+  }
 
   return (
     <header
@@ -164,6 +178,50 @@ export function Navbar() {
             Join Us
           </Link>
 
+          {user ? (
+            <>
+              <Link
+                href="/account"
+                className={cn(
+                  "text-sm font-medium transition-colors hover:text-[color:var(--primary)]",
+                  pathname === "/account" ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
+                )}
+              >
+                Account
+              </Link>
+
+              {user.role === "ADMIN" && (
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-[color:var(--primary)]",
+                    pathname === "/dashboard" ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
+                  )}
+                >
+                  Dashboard
+                </Link>
+              )}
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="inline-flex items-center gap-1 text-sm font-medium text-[color:var(--muted-foreground)] transition-colors hover:text-red-400"
+              >
+                <LogOut className="h-4 w-4" /> Sign Out
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth/sign-in"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-[color:var(--primary)]",
+                pathname === "/auth/sign-in" ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
+              )}
+            >
+              Sign In
+            </Link>
+          )}
+
           {/* <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="relative p-2 rounded-full hover:bg-[color:var(--muted)] transition-colors"
@@ -215,6 +273,43 @@ export function Navbar() {
                 {link.name}
               </Link>
             ))}
+
+            {user ? (
+              <>
+                <Link
+                  href="/account"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-lg font-medium text-[color:var(--muted-foreground)] transition-colors hover:text-[color:var(--primary)]"
+                >
+                  Account
+                </Link>
+                {user.role === "ADMIN" && (
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-lg font-medium text-[color:var(--muted-foreground)] transition-colors hover:text-[color:var(--primary)]"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex items-center gap-2 text-lg font-medium text-red-400"
+                >
+                  <LogOut className="h-4 w-4" /> Sign Out
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/auth/sign-in"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-lg font-medium text-[color:var(--muted-foreground)] transition-colors hover:text-[color:var(--primary)]"
+              >
+                Sign In
+              </Link>
+            )}
+
             <Link
               href="/join"
               onClick={() => setIsMobileMenuOpen(false)}

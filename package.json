@@ -5,9 +5,12 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "next-sitemap",
     "start": "next start",
     "lint": "eslint .",
-    "clean": "next clean"
+    "clean": "next clean",
+    "sitemap": "next-sitemap",
+    "hash:secret": "node scripts/hash-secret.mjs"
   },
   "dependencies": {
     "@google/genai": "^1.17.0",

@@ -7,17 +7,91 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model BlogPost {
+enum UserRole {
+  MEMBER
+  ADMIN
+}
+
+enum SubmissionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DashboardHashAction {
+  GENERATED
+  ACTIVATED
+}
+
+model User {
+  id                   String               @id @default(auto()) @map("_id") @db.ObjectId
+  email                String               @unique
+  name                 String
+  passwordHash         String
+  role                 UserRole             @default(MEMBER)
+  bio                  String?
+  encryptedPrivateNote String?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  deletedAt            DateTime?
+  sessions             Session[]
+  passwordResetTokens  PasswordResetToken[]
+  blogPosts            BlogPost[]           @relation("BlogPostAuthor")
+  approvedBlogPosts    BlogPost[]           @relation("BlogPostApprover")
+  projects             Project[]            @relation("ProjectAuthor")
+  approvedProjects     Project[]            @relation("ProjectApprover")
+  files                FileItem[]           @relation("FileUploader")
+  dashboardHashRecords DashboardHashRecord[] @relation("DashboardHashCreator")
+}
+
+model Session {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  slug      String   @unique
-  content   String
-  excerpt   String?
-  author    String
+  userId    String   @db.ObjectId
+  tokenHash String   @unique
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  published Boolean  @default(false)
-  tags      String[]
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  tokenHash String    @unique
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model BlogPost {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  title            String
+  slug             String           @unique
+  content          String
+  encryptedContent String?
+  excerpt          String?
+  authorId         String           @db.ObjectId
+  approverId       String?          @db.ObjectId
+  status           SubmissionStatus @default(PENDING)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  approvedAt       DateTime?
+  published        Boolean          @default(false)
+  tags             String[]         @default([])
+  rejectedReason   String?
+  author           User             @relation("BlogPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  approver         User?            @relation("BlogPostApprover", fields: [approverId], references: [id], onDelete: SetNull)
+
+  @@index([authorId])
+  @@index([status])
 }
 
 model Event {
@@ -31,23 +105,54 @@ model Event {
 }
 
 model Project {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String
-  techStack   String[]
-  githubUrl   String?
-  liveUrl     String?
-  imageUrl    String?
+  id                   String           @id @default(auto()) @map("_id") @db.ObjectId
+  title                String
+  slug                 String           @unique
+  description          String
+  encryptedDescription String?
+  techStack            String[]         @default([])
+  tags                 String[]         @default([])
+  creators             String[]         @default([])
+  status               SubmissionStatus @default(PENDING)
+  projectState         String           @default("Planning")
+  difficulty           String           @default("Beginner")
+  featured             Boolean          @default(false)
+  githubUrl            String?
+  liveUrl              String?
+  imageUrl             String?
+  semester             String?
+  impact               String?
+  submittedById        String           @db.ObjectId
+  approverId           String?          @db.ObjectId
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  approvedAt           DateTime?
+  rejectedReason       String?
+  submittedBy          User             @relation("ProjectAuthor", fields: [submittedById], references: [id], onDelete: Cascade)
+  approver             User?            @relation("ProjectApprover", fields: [approverId], references: [id], onDelete: SetNull)
+
+  @@index([submittedById])
+  @@index([status])
 }
 
 model FileItem {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String
-  category  String
-  url       String
-  type      String
-  size      Int?
-  createdAt DateTime @default(now())
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  category     String
+  url          String
+  type         String
+  size         Int?
+  visibility   String   @default("Public")
+  meeting      String?
+  tags         String[] @default([])
+  pinned       Boolean  @default(false)
+  description  String?
+  uploadedById String   @db.ObjectId
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  uploadedBy   User     @relation("FileUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  @@index([uploadedById])
 }
 
 model EboardMember {
@@ -59,4 +164,27 @@ model EboardMember {
   linkedin  String?
   github    String?
   order     Int      @default(0)
+}
+
+model AppSetting {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model DashboardHashRecord {
+  id             String              @id @default(auto()) @map("_id") @db.ObjectId
+  hash           String
+  action         DashboardHashAction
+  isCurrent      Boolean             @default(false)
+  createdById    String?             @db.ObjectId
+  createdByName  String
+  createdByEmail String
+  createdAt      DateTime            @default(now())
+  createdBy      User?               @relation("DashboardHashCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([isCurrent])
 }

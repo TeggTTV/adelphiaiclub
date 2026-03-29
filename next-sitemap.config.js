@@ -1,16 +1,14 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.SITE_URL || 'https://adelphiaisociety.vercel.app',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://adelphiaisociety.vercel.app',
   generateRobotsTxt: true,
   generateIndexSitemap: false,
-  sitemapSize: 7000,
+  sitemapSize: 5000,
+  autoLastmod: true,
   changefreq: 'weekly',
   priority: 0.7,
-  exclude: ['/404', '/500'],
+  exclude: ['/404', '/500', '/api/*', '/blog/admin', '/blog/admin/*'],
   robotsTxtOptions: {
-    additionalSitemaps: [
-      'https://adelphiaisociety.vercel.app/server-sitemap.xml', // Optional server-side sitemap
-    ],
     policies: [
       {
         userAgent: '*',
@@ -20,7 +18,8 @@ module.exports = {
           '/500',
           '/api/*',
           '/_next/*',
-          '/admin/*'
+          '/blog/admin',
+          '/blog/admin/*',
         ],
       },
       {
@@ -46,20 +45,28 @@ module.exports = {
     ],
   },
   transform: async (config, path) => {
-    // Customize URLs and their properties
     const customPriorities = {
       '/': 1.0,
+      '/events': 0.95,
+      '/join': 0.9,
       '/about': 0.8,
-      '/events': 0.9,
-      '/board': 0.7,
-      '/contact': 0.6,
+      '/projects': 0.85,
+      '/blog': 0.8,
+      '/eboard': 0.75,
+      '/files': 0.65,
+      '/faq': 0.7,
+      '/contact': 0.7,
     };
 
     const customChangefreq = {
-      '/': 'daily',
+      '/': 'weekly',
       '/events': 'daily',
-      '/board': 'monthly',
+      '/blog': 'weekly',
+      '/projects': 'weekly',
+      '/join': 'monthly',
+      '/eboard': 'monthly',
       '/about': 'monthly',
+      '/faq': 'monthly',
       '/contact': 'monthly',
     };
 

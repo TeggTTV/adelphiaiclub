@@ -1,12 +1,10 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { motion } from "motion/react"
-import { Section } from "@/components/Section"
-import { ArchiveFile, fileCategories } from "@/lib/data"
 import { cn } from "@/lib/utils"
 import {
-  CalendarClock,
   Database,
   Download,
   File,
@@ -17,17 +15,29 @@ import {
   Filter,
   Folder,
   Search,
-  ShieldCheck,
-  ShieldEllipsis,
-  Sparkles,
-  Tag,
-  UserRound,
 } from "lucide-react"
 
 type SortMode = "newest" | "oldest" | "name" | "largest"
 
+type FileRecord = {
+  id: string
+  name: string
+  category: string
+  url: string
+  type: string
+  size: number | null
+  visibility: "Public" | "Members" | string
+  meeting: string | null
+  tags: string[]
+  pinned: boolean
+  createdAt: string
+  uploadedByName: string
+}
+
 function getFileIcon(type: string) {
-  switch (type) {
+  const lowered = type.toLowerCase()
+
+  switch (lowered) {
     case "pdf":
       return <FileText className="h-5 w-5 text-red-400" />
     case "doc":
@@ -50,74 +60,68 @@ function getFileIcon(type: string) {
   }
 }
 
-function formatBytes(bytes: number, decimals = 2) {
-  if (!+bytes) return "0 Bytes"
+function formatBytes(bytes: number | null, decimals = 2) {
+  if (!bytes || bytes <= 0) return "0 Bytes"
+
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"]
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
 export default function FilesPage() {
+  const [files, setFiles] = React.useState<FileRecord[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState("")
+
   const [query, setQuery] = React.useState("")
   const [categoryFilter, setCategoryFilter] = React.useState("All categories")
   const [typeFilter, setTypeFilter] = React.useState("All types")
   const [uploaderFilter, setUploaderFilter] = React.useState("All uploaders")
-  const [visibilityFilter, setVisibilityFilter] = React.useState<"All" | ArchiveFile["visibility"]>("All")
+  const [visibilityFilter, setVisibilityFilter] = React.useState<"All" | "Public" | "Members">("All")
   const [sortMode, setSortMode] = React.useState<SortMode>("newest")
-  const [activeTags, setActiveTags] = React.useState<string[]>([])
 
-  const allFiles = React.useMemo(
-    () =>
-      fileCategories.flatMap((category) =>
-        category.files.map((file) => ({
-          ...file,
-          categoryId: category.id,
-          categoryName: category.name,
-        }))
-      ),
-    []
-  )
+  React.useEffect(() => {
+    fetch("/api/files", { credentials: "include" })
+      .then((response) => response.json())
+      .then((data) => setFiles(data.files || []))
+      .catch(() => setError("Unable to load files"))
+      .finally(() => setLoading(false))
+  }, [])
 
   const uploaders = React.useMemo(
-    () => ["All uploaders", ...new Set(allFiles.map((file) => file.uploadedBy))],
-    [allFiles]
+    () => ["All uploaders", ...new Set(files.map((file) => file.uploadedByName))],
+    [files]
   )
 
   const fileTypes = React.useMemo(
-    () => ["All types", ...new Set(allFiles.map((file) => file.type.toLowerCase()))],
-    [allFiles]
+    () => ["All types", ...new Set(files.map((file) => file.type.toLowerCase()))],
+    [files]
   )
 
   const categoryOptions = React.useMemo(
-    () => ["All categories", ...fileCategories.map((category) => category.name)],
-    []
-  )
-
-  const allTags = React.useMemo(
-    () => [...new Set(allFiles.flatMap((file) => file.tags))].sort((a, b) => a.localeCompare(b)),
-    [allFiles]
+    () => ["All categories", ...new Set(files.map((file) => file.category))],
+    [files]
   )
 
   const filteredFiles = React.useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
 
-    return allFiles
+    return files
       .filter((file) => {
-        if (categoryFilter !== "All categories" && file.categoryName !== categoryFilter) return false
+        if (categoryFilter !== "All categories" && file.category !== categoryFilter) return false
         if (typeFilter !== "All types" && file.type.toLowerCase() !== typeFilter.toLowerCase()) return false
-        if (uploaderFilter !== "All uploaders" && file.uploadedBy !== uploaderFilter) return false
+        if (uploaderFilter !== "All uploaders" && file.uploadedByName !== uploaderFilter) return false
         if (visibilityFilter !== "All" && file.visibility !== visibilityFilter) return false
-        if (activeTags.length > 0 && !activeTags.every((tag) => file.tags.includes(tag))) return false
 
         if (!normalizedQuery) return true
 
         const searchText = [
           file.name,
-          file.meeting,
-          file.uploadedBy,
-          file.categoryName,
+          file.meeting || "",
+          file.uploadedByName,
+          file.category,
           file.visibility,
           ...file.tags,
         ]
@@ -128,42 +132,38 @@ export default function FilesPage() {
       })
       .sort((a, b) => {
         if (sortMode === "name") return a.name.localeCompare(b.name)
-        if (sortMode === "largest") return b.size - a.size
-        if (sortMode === "oldest") {
-          return new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime()
-        }
-
-        return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+        if (sortMode === "largest") return (b.size || 0) - (a.size || 0)
+        if (sortMode === "oldest") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       })
-  }, [activeTags, allFiles, categoryFilter, query, sortMode, typeFilter, uploaderFilter, visibilityFilter])
+  }, [categoryFilter, files, query, sortMode, typeFilter, uploaderFilter, visibilityFilter])
 
   const groupedFiles = React.useMemo(() => {
-    return fileCategories
-      .map((category) => ({
-        id: category.id,
-        name: category.name,
-        description: category.description,
-        files: filteredFiles.filter((file) => file.categoryId === category.id),
-      }))
-      .filter((category) => category.files.length > 0)
+    const groups = new Map<string, FileRecord[]>()
+
+    for (const file of filteredFiles) {
+      if (!groups.has(file.category)) {
+        groups.set(file.category, [])
+      }
+
+      groups.get(file.category)!.push(file)
+    }
+
+    return Array.from(groups.entries()).map(([category, categoryFiles]) => ({
+      category,
+      files: categoryFiles,
+    }))
   }, [filteredFiles])
 
-  const archiveSize = allFiles.reduce((total, file) => total + file.size, 0)
-  const publicCount = allFiles.filter((file) => file.visibility === "Public").length
-  const pinnedCount = allFiles.filter((file) => file.pinned).length
+  const archiveSize = files.reduce((total, file) => total + (file.size || 0), 0)
+  const publicCount = files.filter((file) => file.visibility === "Public").length
+  const pinnedCount = files.filter((file) => file.pinned).length
   const activeFilterCount =
     (query.trim() ? 1 : 0) +
     (categoryFilter !== "All categories" ? 1 : 0) +
     (typeFilter !== "All types" ? 1 : 0) +
     (uploaderFilter !== "All uploaders" ? 1 : 0) +
-    (visibilityFilter !== "All" ? 1 : 0) +
-    activeTags.length
-
-  const toggleTag = (tag: string) => {
-    setActiveTags((current) =>
-      current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag]
-    )
-  }
+    (visibilityFilter !== "All" ? 1 : 0)
 
   const clearFilters = () => {
     setQuery("")
@@ -172,15 +172,13 @@ export default function FilesPage() {
     setUploaderFilter("All uploaders")
     setVisibilityFilter("All")
     setSortMode("newest")
-    setActiveTags([])
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <section className="relative overflow-hidden py-24 md:py-32">
         <div className="absolute inset-0 bg-[linear-gradient(122deg,rgba(10,10,10,0.98),rgba(18,24,44,0.97),rgba(8,12,22,0.98))]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_24%,rgba(56,189,248,0.24),transparent_44%),radial-gradient(circle_at_84%_18%,rgba(99,102,241,0.24),transparent_45%),radial-gradient(circle_at_50%_84%,rgba(16,185,129,0.14),transparent_40%)]" />
-        <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(to_right,rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:30px_30px]" />
 
         <div className="container relative z-10 mx-auto px-4 md:px-6">
           <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-5xl text-center">
@@ -192,7 +190,7 @@ export default function FilesPage() {
               Club Files <span className="text-cyan-200">Database</span>
             </h1>
             <p className="mx-auto mt-5 max-w-3xl text-lg leading-relaxed text-slate-200/85 md:text-xl">
-              A searchable archive of notes, slides, resources, and assets uploaded after meetings, workshops, and events.
+              Admin-managed resources for meetings, workshops, and events.
             </p>
           </motion.div>
 
@@ -202,36 +200,34 @@ export default function FilesPage() {
             transition={{ delay: 0.12 }}
             className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
           >
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-300">Total Files</p>
-              <p className="mt-1 text-3xl font-extrabold text-white">{allFiles.length}</p>
-            </div>
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-300">Archive Size</p>
-              <p className="mt-1 text-3xl font-extrabold text-white">{formatBytes(archiveSize)}</p>
-            </div>
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-300">Public Docs</p>
-              <p className="mt-1 text-3xl font-extrabold text-white">{publicCount}</p>
-            </div>
-            <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur">
-              <p className="text-xs uppercase tracking-[0.14em] text-slate-300">Pinned Items</p>
-              <p className="mt-1 text-3xl font-extrabold text-white">{pinnedCount}</p>
-            </div>
+            <StatCard label="Total Files" value={String(files.length)} />
+            <StatCard label="Archive Size" value={formatBytes(archiveSize)} />
+            <StatCard label="Public Docs" value={String(publicCount)} />
+            <StatCard label="Pinned Items" value={String(pinnedCount)} />
           </motion.div>
         </div>
       </section>
 
-      <Section className="flex-grow bg-[color:var(--muted)]/25">
+      <section className="flex-grow bg-[color:var(--muted)]/25 py-16">
         <div className="container mx-auto max-w-6xl px-4 md:px-6">
-          <div className="sticky top-20 z-20 mb-8 rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)]/92 p-5 shadow-xl backdrop-blur">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <h2 className="text-3xl font-black tracking-tight md:text-4xl">Archive Explorer</h2>
+            <Link
+              href="/dashboard"
+              className="inline-flex h-10 items-center rounded-full border border-[color:var(--border)] px-4 text-sm font-bold"
+            >
+              Admin Dashboard
+            </Link>
+          </div>
+
+          <div className="mb-8 rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)]/92 p-5 shadow-xl backdrop-blur">
             <div className="mb-4 flex flex-wrap items-center gap-3">
               <div className="relative min-w-[220px] flex-1">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--muted-foreground)]" />
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search by file name, meeting, uploader, tags"
+                  placeholder="Search by file name, meeting, or uploader"
                   className="h-11 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] pl-10 pr-3 text-sm outline-none transition focus:border-[color:var(--primary)]"
                 />
               </div>
@@ -239,7 +235,7 @@ export default function FilesPage() {
               <select
                 value={categoryFilter}
                 onChange={(event) => setCategoryFilter(event.target.value)}
-                className="h-11 rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm outline-none transition focus:border-[color:var(--primary)]"
+                className="h-11 rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
               >
                 {categoryOptions.map((category) => (
                   <option key={category} value={category}>
@@ -251,7 +247,7 @@ export default function FilesPage() {
               <select
                 value={typeFilter}
                 onChange={(event) => setTypeFilter(event.target.value)}
-                className="h-11 rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm uppercase outline-none transition focus:border-[color:var(--primary)]"
+                className="h-11 rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm uppercase"
               >
                 {fileTypes.map((type) => (
                   <option key={type} value={type}>
@@ -263,7 +259,7 @@ export default function FilesPage() {
               <select
                 value={uploaderFilter}
                 onChange={(event) => setUploaderFilter(event.target.value)}
-                className="h-11 rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm outline-none transition focus:border-[color:var(--primary)]"
+                className="h-11 rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
               >
                 {uploaders.map((uploader) => (
                   <option key={uploader} value={uploader}>
@@ -276,8 +272,8 @@ export default function FilesPage() {
             <div className="flex flex-wrap items-center gap-2">
               <select
                 value={visibilityFilter}
-                onChange={(event) => setVisibilityFilter(event.target.value as "All" | ArchiveFile["visibility"])}
-                className="h-10 rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-xs font-semibold uppercase tracking-[0.12em] outline-none transition focus:border-[color:var(--primary)]"
+                onChange={(event) => setVisibilityFilter(event.target.value as "All" | "Public" | "Members")}
+                className="h-10 rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-xs font-semibold uppercase tracking-[0.12em]"
               >
                 <option value="All">All visibility</option>
                 <option value="Public">Public</option>
@@ -287,7 +283,7 @@ export default function FilesPage() {
               <select
                 value={sortMode}
                 onChange={(event) => setSortMode(event.target.value as SortMode)}
-                className="h-10 rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-xs font-semibold uppercase tracking-[0.12em] outline-none transition focus:border-[color:var(--primary)]"
+                className="h-10 rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-xs font-semibold uppercase tracking-[0.12em]"
               >
                 <option value="newest">Sort: Newest</option>
                 <option value="oldest">Sort: Oldest</option>
@@ -308,59 +304,21 @@ export default function FilesPage() {
                 Reset
               </button>
             </div>
-
-            <div className="mt-4 border-t border-[color:var(--border)] pt-4">
-              <p className="mb-2 inline-flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-[color:var(--muted-foreground)]">
-                <Tag className="h-3.5 w-3.5" />
-                Tags
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {allTags.map((tag) => {
-                  const active = activeTags.includes(tag)
-                  return (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => toggleTag(tag)}
-                      className={cn(
-                        "rounded-full border px-3 py-1.5 text-xs font-semibold transition",
-                        active
-                          ? "border-[color:var(--primary)] bg-[color:var(--primary)]/15 text-[color:var(--primary)]"
-                          : "border-[color:var(--border)] bg-[color:var(--background)] text-[color:var(--muted-foreground)] hover:border-[color:var(--primary)]"
-                      )}
-                    >
-                      #{tag}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
           </div>
 
-          <div className="mb-6 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-3xl font-black tracking-tight md:text-4xl">Archive Explorer</h2>
-              <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">Showing {filteredFiles.length} of {allFiles.length} files</p>
-            </div>
-          </div>
+          {loading && <p className="text-[color:var(--muted-foreground)]">Loading files...</p>}
+          {error && <p className="mb-4 text-red-400">{error}</p>}
 
-          {groupedFiles.length === 0 ? (
+          {groupedFiles.length === 0 && !loading ? (
             <div className="glass rounded-3xl border-dashed p-10 text-center">
               <p className="text-xl font-bold">No files found for this search.</p>
-              <p className="mt-2 text-[color:var(--muted-foreground)]">Try removing one or more filters or using broader keywords.</p>
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="mt-5 inline-flex h-10 items-center justify-center rounded-full border border-[color:var(--primary)] bg-[color:var(--primary)]/10 px-5 text-sm font-bold text-[color:var(--primary)]"
-              >
-                Reset filters
-              </button>
+              <p className="mt-2 text-[color:var(--muted-foreground)]">Try removing one or more filters.</p>
             </div>
           ) : (
             <div className="space-y-6">
-              {groupedFiles.map((category, index) => (
+              {groupedFiles.map((group, index) => (
                 <motion.div
-                  key={category.id}
+                  key={group.category}
                   initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -369,72 +327,47 @@ export default function FilesPage() {
                 >
                   <div className="flex flex-wrap items-center gap-3 border-b border-[color:var(--border)] bg-[color:var(--background)]/60 px-5 py-4">
                     <Folder className="h-5 w-5 text-[color:var(--primary)]" />
-                    <h3 className="text-xl font-bold">{category.name}</h3>
+                    <h3 className="text-xl font-bold">{group.category}</h3>
                     <span className="rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2.5 py-1 text-xs font-semibold text-[color:var(--muted-foreground)]">
-                      {category.files.length} files
+                      {group.files.length} files
                     </span>
-                    <p className="w-full text-sm text-[color:var(--muted-foreground)]">{category.description}</p>
                   </div>
 
                   <ul className="divide-y divide-[color:var(--border)]">
-                    {category.files.map((file) => (
+                    {group.files.map((file) => (
                       <li key={file.id} className="px-5 py-4 transition hover:bg-[color:var(--muted)]/30">
-                        <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-3">
                               {getFileIcon(file.type)}
                               <h4 className="truncate text-base font-bold">{file.name}</h4>
                               {file.pinned && (
-                                <span className="inline-flex items-center gap-1 rounded-full border border-amber-300/30 bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-amber-300">
-                                  <Sparkles className="h-3 w-3" />
+                                <span className="inline-flex items-center rounded-full border border-amber-300/35 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-amber-300">
                                   Pinned
                                 </span>
                               )}
                             </div>
 
-                            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-[color:var(--muted-foreground)]">
-                              <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2 py-1 uppercase">
+                            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[color:var(--muted-foreground)]">
+                              <span className="inline-flex items-center rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2 py-0.5 uppercase">
                                 {file.type}
                               </span>
-                              <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2 py-1">
-                                <CalendarClock className="h-3.5 w-3.5" />
-                                {new Date(file.uploadedAt).toLocaleDateString()}
-                              </span>
-                              <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2 py-1">
-                                <UserRound className="h-3.5 w-3.5" />
-                                {file.uploadedBy}
-                              </span>
-                              <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2 py-1">
-                                {file.visibility === "Public" ? (
-                                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-                                ) : (
-                                  <ShieldEllipsis className="h-3.5 w-3.5 text-amber-300" />
+                              <span>{new Date(file.createdAt).toLocaleDateString()}</span>
+                              <span
+                                className={cn(
+                                  "inline-flex items-center rounded-full border px-2 py-0.5",
+                                  file.visibility === "Public"
+                                    ? "border-emerald-400/35 bg-emerald-500/10 text-emerald-300"
+                                    : "border-amber-300/35 bg-amber-500/10 text-amber-300"
                                 )}
+                              >
                                 {file.visibility}
                               </span>
-                              <span className="inline-flex items-center rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2 py-1">
+                              <span className="inline-flex items-center rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2 py-0.5">
                                 {formatBytes(file.size)}
                               </span>
-                            </div>
-
-                            <p className="mt-2 text-xs text-[color:var(--muted-foreground)]">Meeting: {file.meeting}</p>
-
-                            <div className="mt-2 flex flex-wrap gap-2">
-                              {file.tags.map((tag) => (
-                                <button
-                                  key={tag}
-                                  type="button"
-                                  onClick={() => toggleTag(tag)}
-                                  className={cn(
-                                    "rounded-full border px-2.5 py-1 text-[11px] font-semibold transition",
-                                    activeTags.includes(tag)
-                                      ? "border-[color:var(--primary)] bg-[color:var(--primary)]/15 text-[color:var(--primary)]"
-                                      : "border-[color:var(--border)] bg-[color:var(--background)] text-[color:var(--muted-foreground)] hover:border-[color:var(--primary)]"
-                                  )}
-                                >
-                                  #{tag}
-                                </button>
-                              ))}
+                              <span>By {file.uploadedByName}</span>
+                              {file.meeting && <span>{file.meeting}</span>}
                             </div>
                           </div>
 
@@ -443,7 +376,6 @@ export default function FilesPage() {
                               href={file.url}
                               download
                               className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-[color:var(--primary)] bg-[color:var(--primary)]/10 px-4 text-xs font-bold uppercase tracking-[0.12em] text-[color:var(--primary)] transition hover:bg-[color:var(--primary)] hover:text-[color:var(--primary-foreground)]"
-                              title="Download file"
                             >
                               <Download className="h-3.5 w-3.5" />
                               Download
@@ -457,8 +389,17 @@ export default function FilesPage() {
               ))}
             </div>
           )}
-          </div>
-      </Section>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 backdrop-blur">
+      <p className="text-xs uppercase tracking-[0.14em] text-slate-300">{label}</p>
+      <p className="mt-1 text-3xl font-extrabold text-white">{value}</p>
     </div>
   )
 }

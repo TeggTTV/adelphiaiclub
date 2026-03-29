@@ -6,9 +6,15 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { EasterEggs } from '@/components/EasterEggs';
+import { AdminDashboardAccess } from '@/components/AdminDashboardAccess';
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_TITLE,
+  SITE_NAME,
+  SITE_URL,
+} from '@/lib/seo';
 import './globals.css';
-
-const siteUrl = 'https://adelphiaisociety.vercel.app';
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -16,16 +22,38 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Adelphi AI Society',
-    template: '%s | Adelphi AI Society',
+    default: DEFAULT_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
-  description: 'Adelphi University\'s Artificial Intelligence Society - Innovate, Create, Explore.',
-  applicationName: 'Adelphi AI Society',
-  keywords: ['Adelphi University', 'AI', 'Artificial Intelligence', 'Machine Learning', 'Student Club'],
+  description: DEFAULT_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    'Adelphi University',
+    'Adelphi AI Society',
+    'Artificial Intelligence Club',
+    'Machine Learning',
+    'Student Organization',
+    'NLP',
+    'Data Science',
+  ],
   alternates: {
     canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
   manifest: '/manifest.json',
   icons: {
@@ -38,34 +66,54 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    url: siteUrl,
-    siteName: 'Adelphi AI Society',
-    title: 'Adelphi AI Society',
-    description: 'Adelphi University\'s Artificial Intelligence Society - Innovate, Create, Explore.',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
     images: [
       {
-        url: '/og-image.png',
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
-        alt: 'Adelphi AI Society',
+        alt: SITE_NAME,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Adelphi AI Society',
-    description: 'Adelphi University\'s Artificial Intelligence Society - Innovate, Create, Explore.',
-    images: ['/og-image.png'],
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
   },
+  category: 'education',
 };
 
 const organizationSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Adelphi AI Society',
-  url: siteUrl,
-  logo: `${siteUrl}/TRANSPARENT%20LOGO.png`,
+  '@type': 'EducationalOrganization',
+  name: SITE_NAME,
+  url: SITE_URL,
+  logo: `${SITE_URL}/TRANSPARENT%20LOGO.png`,
   sameAs: ['https://instagram.com/adelphiaisociety_', 'https://github.com/adelphiaisociety'],
+  description: DEFAULT_DESCRIPTION,
+  parentOrganization: {
+    '@type': 'CollegeOrUniversity',
+    name: 'Adelphi University',
+  },
+};
+
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: SITE_NAME,
+  url: SITE_URL,
+  inLanguage: 'en-US',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: `${SITE_URL}/blog?query={search_term_string}`,
+    'query-input': 'required name=search_term_string',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -76,6 +124,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <Navbar />
           <main className="flex-1 flex flex-col">
@@ -83,6 +135,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <Footer />
           <EasterEggs />
+          <AdminDashboardAccess />
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
