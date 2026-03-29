@@ -67,6 +67,7 @@ type BlogPostRecord = {
   updatedAt: string
   status: string
   published: boolean
+  rejectedReason?: string | null
   content?: string
 }
 
@@ -82,6 +83,7 @@ type ProjectRecord = {
   submittedByName: string
   updatedAt: string
   status: string
+  rejectedReason?: string | null
   featured: boolean
   projectState: string
   difficulty: string
@@ -140,6 +142,8 @@ export default function DashboardPage() {
   const [pendingProjectQueue, setPendingProjectQueue] = React.useState<ProjectRecord[]>([])
   const [approvedPosts, setApprovedPosts] = React.useState<BlogPostRecord[]>([])
   const [approvedProjects, setApprovedProjects] = React.useState<ProjectRecord[]>([])
+  const [rejectedPosts, setRejectedPosts] = React.useState<BlogPostRecord[]>([])
+  const [rejectedProjects, setRejectedProjects] = React.useState<ProjectRecord[]>([])
   const [previewPost, setPreviewPost] = React.useState<BlogPostRecord | null>(null)
   const [previewProject, setPreviewProject] = React.useState<ProjectRecord | null>(null)
   const [passkeyStatus, setPasskeyStatus] = React.useState<PasskeyStatus>(emptyPasskeyStatus)
@@ -252,8 +256,10 @@ export default function DashboardPage() {
 
       const pendingBlogPosts = allBlogPosts.filter((post) => post.status === "PENDING")
       const approvedBlogPosts = allBlogPosts.filter((post) => post.status === "APPROVED")
+      const rejectedBlogPosts = allBlogPosts.filter((post) => post.status === "REJECTED")
       const pendingProjectRows = allProjects.filter((project) => project.status === "PENDING")
       const approvedProjectRows = allProjects.filter((project) => project.status === "APPROVED")
+      const rejectedProjectRows = allProjects.filter((project) => project.status === "REJECTED")
 
       setData(overviewData)
       setFiles(filesData.files || [])
@@ -262,6 +268,8 @@ export default function DashboardPage() {
       setPendingProjectQueue(pendingProjectRows)
       setApprovedPosts(approvedBlogPosts)
       setApprovedProjects(approvedProjectRows)
+      setRejectedPosts(rejectedBlogPosts)
+      setRejectedProjects(rejectedProjectRows)
       setPasskeyStatus({
         configured: Boolean(passkeyData.configured),
         source: passkeyData.source || "none",
@@ -323,13 +331,18 @@ export default function DashboardPage() {
     setMessage("")
     setError("")
 
+    const reason = action === "reject" ? window.prompt("Reason for rejection (optional)", "") : null
+    if (action === "reject" && reason === null) {
+      return
+    }
+
     const response = await fetch(`/api/blog/posts/${id}/review`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ action, reason: reason || undefined }),
     })
 
     const payload = await response.json().catch(() => ({}))
@@ -346,13 +359,18 @@ export default function DashboardPage() {
     setMessage("")
     setError("")
 
+    const reason = action === "reject" ? window.prompt("Reason for rejection (optional)", "") : null
+    if (action === "reject" && reason === null) {
+      return
+    }
+
     const response = await fetch(`/api/projects/${id}/review`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ action }),
+      body: JSON.stringify({ action, reason: reason || undefined }),
     })
 
     const payload = await response.json().catch(() => ({}))
@@ -527,6 +545,83 @@ export default function DashboardPage() {
     }
   }
 
+  const approveRejectedPost = async (id: string) => {
+    setMessage("")
+    setError("")
+    setUpdatingApproved((state) => ({ ...state, [id]: true }))
+
+    try {
+      const response = await fetch(`/api/blog/posts/${id}/review`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ action: "approve" }),
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(payload.error || "Unable to approve rejected post")
+        return
+      }
+
+      setMessage("Rejected post moved back to approved")
+      await load()
+    } catch {
+      setError("Unable to approve rejected post")
+    } finally {
+      setUpdatingApproved((state) => ({ ...state, [id]: false }))
+    }
+  }
+
+  const editBlogPost = async (post: BlogPostRecord) => {
+    const title = window.prompt("Edit post title", post.title)
+    if (title === null) return
+
+    const excerpt = window.prompt("Edit excerpt", post.excerpt || "")
+    if (excerpt === null) return
+
+    const content = window.prompt("Edit content", post.content || "")
+    if (content === null) return
+
+    const tagsInput = window.prompt("Edit tags (comma separated)", post.tags.join(", "))
+    if (tagsInput === null) return
+
+    setMessage("")
+    setError("")
+    setUpdatingApproved((state) => ({ ...state, [post.id]: true }))
+
+    try {
+      const response = await fetch(`/api/blog/posts/${post.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          title: title.trim(),
+          excerpt: excerpt.trim(),
+          content,
+          tags: tagsInput,
+        }),
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(payload.error || "Unable to edit post")
+        return
+      }
+
+      setMessage("Post updated")
+      await load()
+    } catch {
+      setError("Unable to edit post")
+    } finally {
+      setUpdatingApproved((state) => ({ ...state, [post.id]: false }))
+    }
+  }
+
   const rejectApprovedProject = async (id: string) => {
     const confirmed = window.confirm("Move this approved project to rejected?")
     if (!confirmed) return
@@ -616,6 +711,87 @@ export default function DashboardPage() {
       setError("Unable to delete project")
     } finally {
       setUpdatingApproved((state) => ({ ...state, [id]: false }))
+    }
+  }
+
+  const approveRejectedProject = async (id: string) => {
+    setMessage("")
+    setError("")
+    setUpdatingApproved((state) => ({ ...state, [id]: true }))
+
+    try {
+      const response = await fetch(`/api/projects/${id}/review`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ action: "approve" }),
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(payload.error || "Unable to approve rejected project")
+        return
+      }
+
+      setMessage("Rejected project moved back to approved")
+      await load()
+    } catch {
+      setError("Unable to approve rejected project")
+    } finally {
+      setUpdatingApproved((state) => ({ ...state, [id]: false }))
+    }
+  }
+
+  const editProject = async (project: ProjectRecord) => {
+    const title = window.prompt("Edit project title", project.title)
+    if (title === null) return
+
+    const description = window.prompt("Edit project description", project.description)
+    if (description === null) return
+
+    const techStack = window.prompt("Edit tech stack (comma separated)", project.techStack.join(", "))
+    if (techStack === null) return
+
+    const tags = window.prompt("Edit tags (comma separated)", project.tags.join(", "))
+    if (tags === null) return
+
+    const creators = window.prompt("Edit creators (comma separated)", project.creators.join(", "))
+    if (creators === null) return
+
+    setMessage("")
+    setError("")
+    setUpdatingApproved((state) => ({ ...state, [project.id]: true }))
+
+    try {
+      const response = await fetch(`/api/projects/${project.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          title: title.trim(),
+          description,
+          techStack,
+          tags,
+          creators,
+        }),
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(payload.error || "Unable to edit project")
+        return
+      }
+
+      setMessage("Project updated")
+      await load()
+    } catch {
+      setError("Unable to edit project")
+    } finally {
+      setUpdatingApproved((state) => ({ ...state, [project.id]: false }))
     }
   }
 
@@ -814,12 +990,14 @@ export default function DashboardPage() {
       {error && <p className="mb-4 text-sm text-red-400">{error}</p>}
       {message && <p className="mb-4 text-sm text-emerald-300">{message}</p>}
 
-      <div className="mb-8 grid gap-4 md:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-8 grid gap-4 md:grid-cols-3 xl:grid-cols-8">
         <StatCard label="Members" value={String(data.userCount)} />
         <StatCard label="Pending Blog Posts" value={String(pendingBlogQueue.length)} />
         <StatCard label="Pending Projects" value={String(pendingProjectQueue.length)} />
         <StatCard label="Approved Blogs" value={String(approvedPosts.length)} />
         <StatCard label="Approved Projects" value={String(approvedProjects.length)} />
+        <StatCard label="Rejected Blogs" value={String(rejectedPosts.length)} />
+        <StatCard label="Rejected Projects" value={String(rejectedProjects.length)} />
         <StatCard label="Files" value={String(files.length)} />
       </div>
 
@@ -1175,6 +1353,14 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       disabled={busy}
+                      onClick={() => editBlogPost(post)}
+                      className="rounded-full border border-[color:var(--border)] px-3 py-1 text-xs font-bold disabled:opacity-60"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
                       onClick={() => rejectApprovedPost(post.id)}
                       className="rounded-full bg-amber-500 px-3 py-1 text-xs font-bold text-white disabled:opacity-60"
                     >
@@ -1214,6 +1400,14 @@ export default function DashboardPage() {
                         By {project.submittedByName} • Updated {new Date(project.updatedAt).toLocaleDateString()} • {project.featured ? "Featured" : "Standard"}
                       </p>
                     </div>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => editProject(project)}
+                      className="rounded-full border border-[color:var(--border)] px-3 py-1 text-xs font-bold disabled:opacity-60"
+                    >
+                      Edit
+                    </button>
                     <button
                       type="button"
                       disabled={busy}
@@ -1258,6 +1452,122 @@ export default function DashboardPage() {
                         Live Demo
                       </a>
                     ) : null}
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="mb-4 text-2xl font-bold">Rejected Blogs (Monitored)</h2>
+        <div className="glass overflow-hidden rounded-2xl border border-[color:var(--border)]">
+          {rejectedPosts.length === 0 ? (
+            <p className="p-5 text-sm text-[color:var(--muted-foreground)]">No rejected blog posts.</p>
+          ) : (
+            <ul className="divide-y divide-[color:var(--border)]">
+              {rejectedPosts.map((post) => {
+                const busy = Boolean(updatingApproved[post.id])
+
+                return (
+                  <li key={post.id} className="flex flex-wrap items-center gap-3 p-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold">{post.title}</p>
+                      <p className="text-xs text-[color:var(--muted-foreground)]">
+                        By {post.authorName} • Updated {new Date(post.updatedAt).toLocaleDateString()}
+                        {post.rejectedReason ? ` • Reason: ${post.rejectedReason}` : ""}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewPost(post)}
+                      className="rounded-full border border-[color:var(--border)] px-3 py-1 text-xs font-bold"
+                    >
+                      View
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => editBlogPost(post)}
+                      className="rounded-full border border-[color:var(--border)] px-3 py-1 text-xs font-bold disabled:opacity-60"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => approveRejectedPost(post.id)}
+                      className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white disabled:opacity-60"
+                    >
+                      Approve Again
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => deletePost(post.id)}
+                      className="rounded-full bg-rose-500 px-3 py-1 text-xs font-bold text-white disabled:opacity-60"
+                    >
+                      Delete
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="mb-4 text-2xl font-bold">Rejected Projects (Monitored)</h2>
+        <div className="glass overflow-hidden rounded-2xl border border-[color:var(--border)]">
+          {rejectedProjects.length === 0 ? (
+            <p className="p-5 text-sm text-[color:var(--muted-foreground)]">No rejected projects.</p>
+          ) : (
+            <ul className="divide-y divide-[color:var(--border)]">
+              {rejectedProjects.map((project) => {
+                const busy = Boolean(updatingApproved[project.id])
+
+                return (
+                  <li key={project.id} className="flex flex-wrap items-center gap-3 p-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold">{project.title}</p>
+                      <p className="text-xs text-[color:var(--muted-foreground)]">
+                        By {project.submittedByName} • Updated {new Date(project.updatedAt).toLocaleDateString()}
+                        {project.rejectedReason ? ` • Reason: ${project.rejectedReason}` : ""}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewProject(project)}
+                      className="rounded-full border border-[color:var(--border)] px-3 py-1 text-xs font-bold"
+                    >
+                      View
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => editProject(project)}
+                      className="rounded-full border border-[color:var(--border)] px-3 py-1 text-xs font-bold disabled:opacity-60"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => approveRejectedProject(project.id)}
+                      className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white disabled:opacity-60"
+                    >
+                      Approve Again
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => deleteProject(project.id)}
+                      className="rounded-full bg-rose-500 px-3 py-1 text-xs font-bold text-white disabled:opacity-60"
+                    >
+                      Delete
+                    </button>
                   </li>
                 )
               })}
