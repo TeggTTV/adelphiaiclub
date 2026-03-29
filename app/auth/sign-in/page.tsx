@@ -36,7 +36,8 @@ export default function SignInPage() {
       }
 
       notifyAuthChanged()
-      router.push("/account")
+      const destination = data?.user?.role === "ADMIN" ? "/dashboard" : "/"
+      router.push(destination)
       router.refresh()
     } catch {
       setError("Unable to sign in")

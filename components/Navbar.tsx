@@ -16,7 +16,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 const primaryLinks = [
-  { name: "Home", href: "/" },
   { name: "About", href: "/about" },
   { name: "Events", href: "/events" },
 ]
@@ -43,7 +42,31 @@ export function Navbar() {
   const { theme, setTheme } = useTheme()
   const { user, isDashboardAdmin, refresh } = useAuthUser()
 
-  const isMoreActive = moreLinks.some((link) => pathname === link.href)
+  const isPathMatch = React.useCallback(
+    (href: string) => {
+      if (href === "/") return pathname === "/"
+      return pathname === href || pathname.startsWith(`${href}/`)
+    },
+    [pathname]
+  )
+
+  const moreMenuLinks = React.useMemo(() => {
+    const links = [...moreLinks]
+
+    if (user) {
+      links.push({ name: "Account", href: "/account" })
+
+      if (isDashboardAdmin) {
+        links.push({ name: "Dashboard", href: "/dashboard" })
+      }
+    }
+
+    return links
+  }, [isDashboardAdmin, user])
+
+  const activeMoreLink = moreMenuLinks.find((link) => isPathMatch(link.href))
+  const isMoreActive = Boolean(activeMoreLink)
+  const moreLabel = activeMoreLink?.name || "More"
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -123,7 +146,7 @@ export function Navbar() {
               href={link.href}
               className={cn(
                 "text-sm font-medium transition-colors hover:text-[color:var(--primary)]",
-                pathname === link.href ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
+                isPathMatch(link.href) ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
               )}
             >
               {link.name}
@@ -141,7 +164,7 @@ export function Navbar() {
               aria-haspopup="menu"
               aria-label="Open more navigation links"
             >
-              More
+              {moreLabel}
               <ChevronDown className={cn("w-4 h-4 transition-transform", isDesktopMenuOpen && "rotate-180")} />
             </button>
 
@@ -154,18 +177,31 @@ export function Navbar() {
                   transition={{ duration: 0.2 }}
                   className="absolute right-0 mt-3 min-w-48 glass rounded-xl p-2 z-50"
                 >
-                  {moreLinks.map((link) => (
+                  {moreMenuLinks.map((link) => (
                     <Link
                       key={link.name}
                       href={link.href}
                       className={cn(
                         "block rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-[color:var(--muted)] hover:text-[color:var(--primary)]",
-                        pathname === link.href ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
+                        isPathMatch(link.href) ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
                       )}
                     >
                       {link.name}
                     </Link>
                   ))}
+
+                  {user ? (
+                    <>
+                      <div className="my-1 h-px bg-[color:var(--border)]" />
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-red-400 transition-colors hover:bg-[color:var(--muted)]"
+                      >
+                        <LogOut className="h-4 w-4" /> Sign Out
+                      </button>
+                    </>
+                  ) : null}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -178,44 +214,12 @@ export function Navbar() {
             Join Us
           </Link>
 
-          {user ? (
-            <>
-              <Link
-                href="/account"
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-[color:var(--primary)]",
-                  pathname === "/account" ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
-                )}
-              >
-                Account
-              </Link>
-
-              {isDashboardAdmin && (
-                <Link
-                  href="/dashboard"
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-[color:var(--primary)]",
-                    pathname === "/dashboard" ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
-                  )}
-                >
-                  Dashboard
-                </Link>
-              )}
-
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="inline-flex items-center gap-1 text-sm font-medium text-[color:var(--muted-foreground)] transition-colors hover:text-red-400"
-              >
-                <LogOut className="h-4 w-4" /> Sign Out
-              </button>
-            </>
-          ) : (
+          {user ? null : (
             <Link
               href="/auth/sign-in"
               className={cn(
                 "text-sm font-medium transition-colors hover:text-[color:var(--primary)]",
-                pathname === "/auth/sign-in" ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
+                isPathMatch("/auth/sign-in") ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
               )}
             >
               Sign In
@@ -267,7 +271,7 @@ export function Navbar() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={cn(
                   "text-lg font-medium transition-colors hover:text-[color:var(--primary)]",
-                  pathname === link.href ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
+                  isPathMatch(link.href) ? "text-[color:var(--primary)]" : "text-[color:var(--muted-foreground)]"
                 )}
               >
                 {link.name}

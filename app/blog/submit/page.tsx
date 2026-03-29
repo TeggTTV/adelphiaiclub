@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { X } from "lucide-react"
 
 type AuthPayload = {
   user: {
@@ -71,12 +72,20 @@ export default function SubmitBlogPage() {
       <div className="mx-auto w-full max-w-2xl px-4 py-24 text-center">
         <h1 className="text-4xl font-black">Submit a Blog Post</h1>
         <p className="mt-3 text-[color:var(--muted-foreground)]">You need an account to submit posts.</p>
-        <Link
-          href="/auth/sign-in"
-          className="mt-6 inline-flex h-11 items-center rounded-full bg-[color:var(--primary)] px-6 text-sm font-bold text-[color:var(--primary-foreground)]"
-        >
-          Sign In
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/auth/sign-in"
+            className="inline-flex h-11 items-center rounded-full bg-[color:var(--primary)] px-6 text-sm font-bold text-[color:var(--primary-foreground)]"
+          >
+            Sign In
+          </Link>
+          <Link
+            href="/blog"
+            className="inline-flex h-11 items-center gap-1 rounded-full border border-[color:var(--border)] px-5 text-sm font-semibold"
+          >
+            <X className="h-4 w-4" /> Close
+          </Link>
+        </div>
       </div>
     )
   }
@@ -84,10 +93,20 @@ export default function SubmitBlogPage() {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-24">
       <div className="glass rounded-2xl border border-[color:var(--border)] p-8">
-        <h1 className="text-4xl font-black tracking-tight">Submit a Blog Post</h1>
-        <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
-          Your article will be visible after admin approval.
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-4xl font-black tracking-tight">Submit a Blog Post</h1>
+            <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
+              Your article will be visible after admin approval.
+            </p>
+          </div>
+          <Link
+            href="/blog"
+            className="inline-flex h-10 items-center gap-1 rounded-full border border-[color:var(--border)] px-4 text-sm font-semibold"
+          >
+            <X className="h-4 w-4" /> Close
+          </Link>
+        </div>
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           <input
