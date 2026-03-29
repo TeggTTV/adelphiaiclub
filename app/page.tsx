@@ -5,7 +5,6 @@ import Link from "next/link"
 import { motion, useScroll, useTransform } from "motion/react"
 import { ArrowRight, Calendar, Code, Users, ChevronRight, FileCode2, User } from "lucide-react"
 import { Section } from "@/components/Section"
-import { upcomingEvents, eboardMembers, projects } from "@/lib/data"
 import { format } from "date-fns"
 
 function TypewriterEffect({ words }: { words: string[] }) {
@@ -41,9 +40,71 @@ function TypewriterEffect({ words }: { words: string[] }) {
   )
 }
 
+type HomeEvent = {
+  id: string
+  title: string
+  description: string
+  date: string
+  location: string
+  link: string | null
+}
+
+type HomeEboardMember = {
+  id: string
+  name: string
+  role: string
+  bio: string | null
+}
+
+type HomeProject = {
+  id: string
+  title: string
+  description: string
+  techStack: string[]
+  githubUrl: string | null
+}
+
 export default function Home() {
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 500], [0, 150])
+  const [events, setEvents] = React.useState<HomeEvent[]>([])
+  const [members, setMembers] = React.useState<HomeEboardMember[]>([])
+  const [featuredProjects, setFeaturedProjects] = React.useState<HomeProject[]>([])
+
+  React.useEffect(() => {
+    let cancelled = false
+
+    const loadHomeData = async () => {
+      try {
+        const response = await fetch("/api/home", { credentials: "include" })
+        if (!response.ok) {
+          throw new Error("Unable to fetch home data")
+        }
+
+        const payload = (await response.json()) as {
+          events?: HomeEvent[]
+          members?: HomeEboardMember[]
+          projects?: HomeProject[]
+        }
+
+        if (cancelled) {
+          return
+        }
+
+        setEvents(payload.events ?? [])
+        setMembers(payload.members ?? [])
+        setFeaturedProjects(payload.projects ?? [])
+      } catch (error) {
+        console.error("Failed to load landing page data", error)
+      }
+    }
+
+    loadHomeData()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
@@ -196,7 +257,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {upcomingEvents.slice(0, 3).map((event, i) => (
+            {events.map((event, i) => (
               <motion.div
                 key={event.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -209,7 +270,7 @@ export default function Home() {
                   <Calendar className="w-24 h-24 text-[color:var(--primary)]" />
                 </div>
                 <div className="text-sm font-bold text-[color:var(--primary)] mb-2">
-                  {format(event.date, "MMM d, yyyy • h:mm a")}
+                  {format(new Date(event.date), "MMM d, yyyy • h:mm a")}
                 </div>
                 <h3 className="text-xl font-bold mb-3 relative z-10">{event.title}</h3>
                 <p className="text-[color:var(--muted-foreground)] text-sm mb-6 flex-grow relative z-10">
@@ -225,6 +286,11 @@ export default function Home() {
                 </div>
               </motion.div>
             ))}
+            {events.length === 0 && (
+              <div className="md:col-span-2 lg:col-span-3 glass rounded-2xl p-8 text-center text-[color:var(--muted-foreground)]">
+                Upcoming events will appear here once they are added in the dashboard.
+              </div>
+            )}
           </div>
         </div>
       </Section>
@@ -259,7 +325,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {eboardMembers.map((member, i) => (
+            {members.map((member, i) => (
               <motion.div
                 key={member.id}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -274,10 +340,15 @@ export default function Home() {
                 <div>
                   <h3 className="text-lg font-bold">{member.name}</h3>
                   <p className="text-sm font-medium text-[color:var(--primary)]">{member.role}</p>
-                  <p className="text-xs text-[color:var(--muted-foreground)]">{member.bio}</p>
+                  <p className="text-xs text-[color:var(--muted-foreground)]">{member.bio ?? ""}</p>
                 </div>
               </motion.div>
             ))}
+            {members.length === 0 && (
+              <div className="sm:col-span-2 lg:col-span-3 glass rounded-2xl p-8 text-center text-[color:var(--muted-foreground)]">
+                Executive board members will appear here once they are added in the dashboard.
+              </div>
+            )}
           </div>
           
           <div className="text-center mt-10">
@@ -302,7 +373,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projects.slice(0, 2).map((project, i) => (
+            {featuredProjects.map((project, i) => (
               <motion.div
                 key={project.id}
                 initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
@@ -336,6 +407,11 @@ export default function Home() {
                 </div>
               </motion.div>
             ))}
+            {featuredProjects.length === 0 && (
+              <div className="md:col-span-2 glass rounded-3xl p-10 text-center text-[color:var(--muted-foreground)]">
+                Featured projects will appear here once approved projects are published.
+              </div>
+            )}
           </div>
         </div>
       </Section>

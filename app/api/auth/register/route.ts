@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { UserRole } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { createSession, sessionCookieOptions, SESSION_COOKIE_NAME } from "@/lib/auth"
+import { createSession, isConfiguredAdminEmail, sessionCookieOptions, SESSION_COOKIE_NAME } from "@/lib/auth"
 import { encryptForStorage } from "@/lib/crypto"
 import { jsonError } from "@/lib/api"
 import { hashPassword } from "@/lib/security"
-
-function getAdminEmails() {
-  const raw = process.env.ADMIN_EMAILS || ""
-  return raw
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean)
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,7 +35,7 @@ export async function POST(request: NextRequest) {
       return jsonError("An account with this email already exists", 409)
     }
 
-    const role = getAdminEmails().includes(email) ? UserRole.ADMIN : UserRole.MEMBER
+    const role = isConfiguredAdminEmail(email) ? UserRole.ADMIN : UserRole.MEMBER
 
     const user = await prisma.user.create({
       data: {

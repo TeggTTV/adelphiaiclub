@@ -19,6 +19,7 @@ type AuthUser = {
 type AuthState = {
   loading: boolean
   user: AuthUser | null
+  isDashboardAdmin: boolean
   dashboardAccess: boolean
   refresh: () => Promise<void>
 }
@@ -26,6 +27,7 @@ type AuthState = {
 export function useAuthUser(): AuthState {
   const [loading, setLoading] = React.useState(true)
   const [user, setUser] = React.useState<AuthUser | null>(null)
+  const [isDashboardAdmin, setIsDashboardAdmin] = React.useState(false)
   const [dashboardAccess, setDashboardAccess] = React.useState(false)
 
   const refresh = React.useCallback(async () => {
@@ -38,15 +40,18 @@ export function useAuthUser(): AuthState {
 
       if (!response.ok) {
         setUser(null)
+        setIsDashboardAdmin(false)
         setDashboardAccess(false)
         return
       }
 
       const data = await response.json()
       setUser(data.user || null)
+      setIsDashboardAdmin(Boolean(data.isDashboardAdmin))
       setDashboardAccess(Boolean(data.dashboardAccess))
     } catch {
       setUser(null)
+      setIsDashboardAdmin(false)
       setDashboardAccess(false)
     } finally {
       setLoading(false)
@@ -86,6 +91,7 @@ export function useAuthUser(): AuthState {
   return {
     loading,
     user,
+    isDashboardAdmin,
     dashboardAccess,
     refresh,
   }

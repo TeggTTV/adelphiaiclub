@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { SubmissionStatus } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { getCurrentUser, hasDashboardAccess } from "@/lib/auth"
+import { getCurrentUser, hasDashboardAccess, isDashboardAdminUser } from "@/lib/auth"
 import { jsonError } from "@/lib/api"
 
 type RouteParams = { params: Promise<{ id: string }> }
 
 export async function POST(request: NextRequest, context: RouteParams) {
   const user = await getCurrentUser()
-  if (!user || user.role !== "ADMIN") {
+  if (!user || !isDashboardAdminUser(user)) {
     return jsonError("Admin access required", 403)
   }
 

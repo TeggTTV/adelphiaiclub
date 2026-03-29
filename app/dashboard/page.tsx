@@ -164,6 +164,36 @@ export default function DashboardPage() {
 
   const [updatingUsers, setUpdatingUsers] = React.useState<Record<string, boolean>>({})
   const [updatingApproved, setUpdatingApproved] = React.useState<Record<string, boolean>>({})
+  const [checkingUnlock, setCheckingUnlock] = React.useState(true)
+  const [dashboardUnlocked, setDashboardUnlocked] = React.useState(false)
+  const [unlockPasskey, setUnlockPasskey] = React.useState("")
+  const [unlocking, setUnlocking] = React.useState(false)
+  const [unlockError, setUnlockError] = React.useState("")
+
+  const checkUnlockAccess = React.useCallback(async () => {
+    setCheckingUnlock(true)
+
+    try {
+      const response = await fetch("/api/auth/me", {
+        credentials: "include",
+        cache: "no-store",
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setDashboardUnlocked(false)
+        setUnlockError(payload.error || "Unable to verify dashboard access")
+        return
+      }
+
+      setDashboardUnlocked(Boolean(payload.dashboardAccess))
+    } catch {
+      setDashboardUnlocked(false)
+      setUnlockError("Unable to verify dashboard access")
+    } finally {
+      setCheckingUnlock(false)
+    }
+  }, [])
 
   const load = React.useCallback(async () => {
     setLoading(true)
@@ -187,7 +217,13 @@ export default function DashboardPage() {
       const projectData = await projectResponse.json().catch(() => ({}))
 
       if (!overviewResponse.ok) {
-        setError(overviewData.error || "Unable to load dashboard. Unlock using Ctrl+Shift+D.")
+        if (overviewResponse.status === 401) {
+          setDashboardUnlocked(false)
+          setUnlockError(overviewData.error || "Dashboard unlock required")
+          return
+        }
+
+        setError(overviewData.error || "Unable to load dashboard")
         return
       }
 
@@ -242,8 +278,46 @@ export default function DashboardPage() {
   }, [])
 
   React.useEffect(() => {
+    void checkUnlockAccess()
+  }, [checkUnlockAccess])
+
+  React.useEffect(() => {
+    if (!dashboardUnlocked) {
+      return
+    }
+
     void load()
-  }, [load])
+  }, [dashboardUnlocked, load])
+
+  const unlockDashboard = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setUnlockError("")
+    setUnlocking(true)
+
+    try {
+      const response = await fetch("/api/auth/admin/unlock", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ passkey: unlockPasskey }),
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setUnlockError(payload.error || "Unable to unlock dashboard")
+        return
+      }
+
+      setDashboardUnlocked(true)
+      setUnlockPasskey("")
+    } catch {
+      setUnlockError("Unable to unlock dashboard")
+    } finally {
+      setUnlocking(false)
+    }
+  }
 
   const reviewPost = async (id: string, action: "approve" | "reject") => {
     setMessage("")
@@ -670,6 +744,42 @@ export default function DashboardPage() {
     } finally {
       setUpdatingUsers((state) => ({ ...state, [targetUserId]: false }))
     }
+  }
+
+  if (checkingUnlock) {
+    return <div className="flex min-h-screen items-center justify-center">Checking dashboard access...</div>
+  }
+
+  if (!dashboardUnlocked) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-4 py-24">
+        <div className="glass w-full max-w-md rounded-2xl border border-[color:var(--border)] p-6">
+          <h1 className="text-2xl font-black tracking-tight">Unlock Creator Dashboard</h1>
+          <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
+            Enter the dashboard passkey hash to access admin tools.
+          </p>
+
+          <form onSubmit={unlockDashboard} className="mt-5 space-y-3">
+            <input
+              type="password"
+              value={unlockPasskey}
+              onChange={(event) => setUnlockPasskey(event.target.value)}
+              placeholder="Dashboard passkey"
+              className="h-11 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+              required
+            />
+            {unlockError ? <p className="text-sm text-red-400">{unlockError}</p> : null}
+            <button
+              type="submit"
+              disabled={unlocking}
+              className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[color:var(--primary)] px-4 text-sm font-bold text-[color:var(--primary-foreground)] disabled:opacity-60"
+            >
+              {unlocking ? "Unlocking..." : "Unlock Dashboard"}
+            </button>
+          </form>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {

@@ -1,17 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { UserRole } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { createSession, sessionCookieOptions, SESSION_COOKIE_NAME } from "@/lib/auth"
+import { createSession, isConfiguredAdminEmail, sessionCookieOptions, SESSION_COOKIE_NAME } from "@/lib/auth"
 import { jsonError } from "@/lib/api"
 import { verifyPassword } from "@/lib/security"
-
-function getAdminEmails() {
-  const raw = process.env.ADMIN_EMAILS || ""
-  return raw
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean)
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,13 +38,23 @@ export async function POST(request: NextRequest) {
       return jsonError("Invalid email or password", 401)
     }
 
-    let effectiveRole = user.role
-    if (user.role !== UserRole.ADMIN && getAdminEmails().includes(user.email.toLowerCase())) {
+    const shouldBeAdmin = isConfiguredAdminEmail(user.email)
+    let effectiveRole = shouldBeAdmin ? UserRole.ADMIN : UserRole.MEMBER
+
+    if (shouldBeAdmin && user.role !== UserRole.ADMIN) {
       await prisma.user.update({
         where: { id: user.id },
         data: { role: UserRole.ADMIN },
       })
       effectiveRole = UserRole.ADMIN
+    }
+
+    if (!shouldBeAdmin && user.role === UserRole.ADMIN) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { role: UserRole.MEMBER },
+      })
+      effectiveRole = UserRole.MEMBER
     }
 
     const session = await createSession(user.id, {

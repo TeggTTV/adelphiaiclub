@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { SubmissionStatus } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { getCurrentUser } from "@/lib/auth"
+import { getCurrentUser, isDashboardAdminUser } from "@/lib/auth"
 import { canAccessOwnerResource } from "@/lib/rls"
 import { parseTags, jsonError } from "@/lib/api"
 import { encryptForStorage } from "@/lib/crypto"
@@ -34,6 +34,7 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
 
   try {
     const body = await request.json()
+    const isAdmin = isDashboardAdminUser(user)
 
     const title = typeof body.title === "string" ? body.title.trim() : undefined
     const description = typeof body.description === "string" ? body.description.trim() : undefined
@@ -58,12 +59,12 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
         ...(typeof body.imageUrl === "string" ? { imageUrl: body.imageUrl } : {}),
         ...(typeof body.semester === "string" ? { semester: body.semester } : {}),
         ...(typeof body.impact === "string" ? { impact: body.impact } : {}),
-        ...(user.role === "ADMIN" && typeof body.featured === "boolean"
+        ...(isAdmin && typeof body.featured === "boolean"
           ? {
               featured: body.featured,
             }
           : {}),
-        ...(user.role !== "ADMIN"
+        ...(!isAdmin
           ? {
               status: SubmissionStatus.PENDING,
               featured: false,

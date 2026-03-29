@@ -2,13 +2,16 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "motion/react"
 import { Shield, KeyRound, X } from "lucide-react"
 import { useAuthUser } from "@/hooks/use-auth-user"
 
 export function AdminDashboardAccess() {
   const router = useRouter()
+  const pathname = usePathname()
   const { user, refresh } = useAuthUser()
+  const isDashboardRoute = pathname.startsWith("/dashboard")
 
   const [open, setOpen] = React.useState(false)
   const [passkey, setPasskey] = React.useState("")
@@ -16,6 +19,10 @@ export function AdminDashboardAccess() {
   const [error, setError] = React.useState("")
 
   React.useEffect(() => {
+    if (isDashboardRoute) {
+      return
+    }
+
     const handler = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "d") {
         event.preventDefault()
@@ -25,7 +32,11 @@ export function AdminDashboardAccess() {
 
     window.addEventListener("keydown", handler)
     return () => window.removeEventListener("keydown", handler)
-  }, [])
+  }, [isDashboardRoute])
+
+  if (isDashboardRoute) {
+    return null
+  }
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

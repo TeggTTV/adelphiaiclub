@@ -1,14 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 import { UserRole } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { getCurrentUser, hasDashboardAccess, revokeAllUserSessions } from "@/lib/auth"
+import {
+  getCurrentUser,
+  hasDashboardAccess,
+  isConfiguredAdminEmail,
+  isDashboardAdminUser,
+  revokeAllUserSessions,
+} from "@/lib/auth"
 import { jsonError } from "@/lib/api"
 
 type RouteParams = { params: Promise<{ id: string }> }
 
 async function requireAdminDashboardAccess() {
   const user = await getCurrentUser()
-  if (!user || user.role !== "ADMIN") {
+  if (!isDashboardAdminUser(user)) {
     return null
   }
 
@@ -21,12 +27,17 @@ async function requireAdminDashboardAccess() {
 }
 
 async function activeAdminCount() {
-  return prisma.user.count({
+  const admins = await prisma.user.findMany({
     where: {
       role: UserRole.ADMIN,
       OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
     },
+    select: {
+      email: true,
+    },
   })
+
+  return admins.filter((admin) => isConfiguredAdminEmail(admin.email)).length
 }
 
 export async function PATCH(request: NextRequest, context: RouteParams) {
@@ -49,6 +60,7 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
       where: { id },
       select: {
         id: true,
+        email: true,
         role: true,
         deletedAt: true,
       },
@@ -60,6 +72,15 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
 
     if (target.id === actor.id && nextRole !== UserRole.ADMIN) {
       return jsonError("You cannot demote your own admin role", 400)
+    }
+
+    const targetIsConfiguredAdmin = isConfiguredAdminEmail(target.email)
+    if (nextRole === UserRole.ADMIN && !targetIsConfiguredAdmin) {
+      return jsonError("Only emails listed in ADMIN_EMAILS can be assigned ADMIN", 400)
+    }
+
+    if (nextRole === UserRole.MEMBER && targetIsConfiguredAdmin) {
+      return jsonError("Configured admin accounts cannot be demoted", 400)
     }
 
     if (target.role === UserRole.ADMIN && nextRole === UserRole.MEMBER) {
@@ -104,6 +125,7 @@ export async function DELETE(_: NextRequest, context: RouteParams) {
     where: { id },
     select: {
       id: true,
+      email: true,
       role: true,
       deletedAt: true,
     },
@@ -117,7 +139,7 @@ export async function DELETE(_: NextRequest, context: RouteParams) {
     return jsonError("You cannot delete your own account from dashboard", 400)
   }
 
-  if (target.role === UserRole.ADMIN) {
+  if (target.role === UserRole.ADMIN && isConfiguredAdminEmail(target.email)) {
     const admins = await activeAdminCount()
     if (admins <= 1) {
       return jsonError("At least one admin is required", 400)

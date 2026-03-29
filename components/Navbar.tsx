@@ -41,7 +41,7 @@ export function Navbar() {
   const desktopMenuRef = React.useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
-  const { user, refresh } = useAuthUser()
+  const { user, isDashboardAdmin, refresh } = useAuthUser()
 
   const isMoreActive = moreLinks.some((link) => pathname === link.href)
 
@@ -190,7 +190,7 @@ export function Navbar() {
                 Account
               </Link>
 
-              {user.role === "ADMIN" && (
+              {isDashboardAdmin && (
                 <Link
                   href="/dashboard"
                   className={cn(
@@ -283,7 +283,7 @@ export function Navbar() {
                 >
                   Account
                 </Link>
-                {user.role === "ADMIN" && (
+                {isDashboardAdmin && (
                   <Link
                     href="/dashboard"
                     onClick={() => setIsMobileMenuOpen(false)}

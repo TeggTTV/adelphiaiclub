@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { SubmissionStatus } from "@prisma/client"
 import prisma from "@/lib/prisma"
-import { getCurrentUser } from "@/lib/auth"
+import { getCurrentUser, isDashboardAdminUser } from "@/lib/auth"
 import { decryptFromStorage, encryptForStorage } from "@/lib/crypto"
 import { jsonError, parseTags } from "@/lib/api"
 import { randomToken, slugify } from "@/lib/security"
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     return jsonError("Unauthorized", 401)
   }
 
-  if (scope === "all" && user?.role !== "ADMIN") {
+  if (scope === "all" && !isDashboardAdminUser(user)) {
     return jsonError("Admin access required", 403)
   }
 

@@ -1,7 +1,7 @@
 import { DashboardHashAction } from "@prisma/client"
 import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
-import { getCurrentUser, hasDashboardAccess } from "@/lib/auth"
+import { getCurrentUser, hasDashboardAccess, isDashboardAdminUser } from "@/lib/auth"
 import { jsonError } from "@/lib/api"
 import { hashPassword } from "@/lib/security"
 
@@ -13,8 +13,8 @@ async function assertAdminDashboardAccess() {
     return { ok: false as const, response: jsonError("Sign in required", 401) }
   }
 
-  if (user.role !== "ADMIN") {
-    return { ok: false as const, response: jsonError("Admin role required", 403) }
+  if (!isDashboardAdminUser(user)) {
+    return { ok: false as const, response: jsonError("Admin access required", 403) }
   }
 
   const unlocked = await hasDashboardAccess()

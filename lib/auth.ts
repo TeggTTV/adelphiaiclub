@@ -18,6 +18,24 @@ type UserSessionRecord = {
 
 export type AuthUser = UserSessionRecord
 
+function getConfiguredAdminEmails() {
+  const raw = process.env.ADMIN_EMAILS || ""
+  return raw
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean)
+}
+
+export function isConfiguredAdminEmail(email: string | null | undefined) {
+  if (!email) return false
+  return getConfiguredAdminEmails().includes(email.trim().toLowerCase())
+}
+
+export function isDashboardAdminUser(user: AuthUser | null | undefined) {
+  if (!user) return false
+  return user.role === "ADMIN" && isConfiguredAdminEmail(user.email)
+}
+
 function isSecureCookie() {
   return process.env.NODE_ENV === "production"
 }
@@ -128,7 +146,7 @@ export async function requireUser() {
 
 export async function isAdminUser() {
   const user = await getCurrentUser()
-  return user?.role === "ADMIN"
+  return isDashboardAdminUser(user)
 }
 
 export function createDashboardAccessValue(userId: string) {
@@ -156,7 +174,11 @@ export function verifyDashboardAccessValue(value: string, userId: string) {
 
 export async function hasDashboardAccess() {
   const user = await getCurrentUser()
-  if (!user || user.role !== "ADMIN") {
+  if (!user) {
+    return false
+  }
+
+  if (!isDashboardAdminUser(user)) {
     return false
   }
 

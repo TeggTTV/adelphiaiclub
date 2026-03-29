@@ -7,7 +7,7 @@ module.exports = {
   autoLastmod: true,
   changefreq: 'weekly',
   priority: 0.7,
-  exclude: ['/404', '/500', '/api/*', '/blog/admin', '/blog/admin/*'],
+  exclude: ['/404', '/500', '/api/*', '/blog/admin', '/blog/admin/*', '/dashboard', '/dashboard/*'],
   robotsTxtOptions: {
     policies: [
       {
@@ -17,6 +17,8 @@ module.exports = {
           '/404',
           '/500',
           '/api/*',
+          '/dashboard',
+          '/dashboard/*',
           '/_next/*',
           '/blog/admin',
           '/blog/admin/*',

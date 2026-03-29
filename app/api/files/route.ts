@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { mkdir, writeFile } from "fs/promises"
 import path from "path"
 import prisma from "@/lib/prisma"
-import { getCurrentUser, hasDashboardAccess } from "@/lib/auth"
+import { getCurrentUser, hasDashboardAccess, isDashboardAdminUser } from "@/lib/auth"
 import { jsonError, parseTags } from "@/lib/api"
 import { randomToken } from "@/lib/security"
 
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
   const scope = searchParams.get("scope")
 
   const user = await getCurrentUser()
-  const isAdmin = user?.role === "ADMIN"
+  const isAdmin = isDashboardAdminUser(user)
 
   if (scope === "all" && !isAdmin) {
     return jsonError("Admin access required", 403)
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser()
-  if (!user || user.role !== "ADMIN") {
+  if (!user || !isDashboardAdminUser(user)) {
     return jsonError("Admin access required", 403)
   }
 

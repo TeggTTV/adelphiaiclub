@@ -4,6 +4,7 @@ import {
   DASHBOARD_COOKIE_NAME,
   createDashboardAccessValue,
   getCurrentUser,
+  isDashboardAdminUser,
   sessionCookieOptions,
 } from "@/lib/auth"
 import { jsonError } from "@/lib/api"
@@ -62,12 +63,8 @@ async function verifyAdminPasskey(passkey: string) {
 
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser()
-  if (!user) {
-    return jsonError("Sign in required", 401)
-  }
-
-  if (user.role !== "ADMIN") {
-    return jsonError("Admin role required", 403)
+  if (!user || !isDashboardAdminUser(user)) {
+    return jsonError("Admin access required", 403)
   }
 
   try {
