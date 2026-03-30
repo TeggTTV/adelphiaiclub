@@ -22,6 +22,7 @@ type SortMode = "featured" | "recent" | "title"
 
 type Project = {
   id: string
+  slug: string
   title: string
   description: string
   techStack: string[]
