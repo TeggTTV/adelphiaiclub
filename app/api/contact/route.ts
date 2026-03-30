@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { Resend } from "resend"
 import prisma from "@/lib/prisma"
+import { checkRateLimit, ipKey } from "@/lib/rateLimit"
 
 export async function POST(req: Request) {
   try {
@@ -11,6 +12,14 @@ export async function POST(req: Request) {
         { error: "Missing required fields" },
         { status: 400 }
       )
+    }
+
+    // Rate limit by IP: limit contact submissions to 5 per 10 minutes per IP
+    const ipHeader = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || req.headers.get("cf-connecting-ip")
+    const key = ipKey(ipHeader, "contact")
+    const rate = checkRateLimit(key, Number(process.env.CONTACT_RATE_LIMIT || 5), 10 * 60 * 1000)
+    if (!rate.allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 })
     }
 
     // persist message to DB (best-effort)

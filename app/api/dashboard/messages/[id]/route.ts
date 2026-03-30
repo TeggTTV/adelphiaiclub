@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { getCurrentUser, hasDashboardAccess, isDashboardAdminUser } from "@/lib/auth"
 import { jsonError } from "@/lib/api"
+import { checkRateLimit, ipKey } from "@/lib/rateLimit"
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const user = await getCurrentUser()
@@ -15,6 +16,17 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 
   const { id } = params
+  // Rate limit admin operations to avoid abuse: 60 updates per minute per admin
+  try {
+    const ipHeader = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || req.headers.get("cf-connecting-ip")
+    const key = ipKey(ipHeader, `admin:${user?.id}:messages`)
+    const rate = checkRateLimit(key, Number(process.env.ADMIN_RATE_LIMIT || 60), 60 * 1000)
+    if (!rate.allowed) {
+      return jsonError("Too many requests", 429)
+    }
+  } catch (e) {
+    // ignore rate limiter failures
+  }
   try {
     const updated = await prisma.message.update({
       where: { id },
