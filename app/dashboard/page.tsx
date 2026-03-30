@@ -204,6 +204,7 @@ export default function DashboardPage() {
     role: string
     bio?: string | null
     imageUrl?: string | null
+    instagram?: string | null
     linkedin?: string | null
     github?: string | null
     order: number
@@ -573,7 +574,7 @@ export default function DashboardPage() {
       })
       const payload = await response.json().catch(() => ({}))
       if (!response.ok) { setError(payload.error || 'Unable to create member'); return }
-      setNewEboardForm({ name: '', role: '', bio: '', imageUrl: '', linkedin: '', github: '', order: 0 })
+      setNewEboardForm({ name: '', role: '', bio: '', imageUrl: '', instagram: '', linkedin: '', github: '', order: 0 })
       await load()
     } catch {
       setError('Unable to create member')
