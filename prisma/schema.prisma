@@ -164,6 +164,7 @@ model EboardMember {
   role      String
   bio       String?
   imageUrl  String?
+  instagram String?
   linkedin  String?
   github    String?
   order     Int      @default(0)

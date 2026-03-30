@@ -198,6 +198,18 @@ export default function DashboardPage() {
     liveUrl: "",
   })
   const [passkeyStatus, setPasskeyStatus] = React.useState<PasskeyStatus>(emptyPasskeyStatus)
+  const [eboard, setEboard] = React.useState<Array<{
+    id: string
+    name: string
+    role: string
+    bio?: string | null
+    imageUrl?: string | null
+    linkedin?: string | null
+    github?: string | null
+    order: number
+  }>>([])
+  const [editingEboardId, setEditingEboardId] = React.useState<string | null>(null)
+  const [newEboardForm, setNewEboardForm] = React.useState({ name: "", role: "", bio: "", imageUrl: "", instagram: "", linkedin: "", github: "", order: 0 })
 
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
@@ -262,7 +274,6 @@ export default function DashboardPage() {
         fetch("/api/dashboard/security/passkey", { credentials: "include" }),
         fetch("/api/blog/posts?scope=all", { credentials: "include" }),
         fetch("/api/projects?scope=all", { credentials: "include" }),
-          fetch("/api/dashboard/messages", { credentials: "include" }),
       ])
 
       const overviewData = await overviewResponse.json().catch(() => ({}))
@@ -272,6 +283,7 @@ export default function DashboardPage() {
       const blogData = await blogResponse.json().catch(() => ({}))
       const projectData = await projectResponse.json().catch(() => ({}))
       const messagesData = await (await fetch("/api/dashboard/messages", { credentials: "include" })).json().catch(() => ({}))
+      const eboardData = await (await fetch("/api/dashboard/eboard", { credentials: "include" })).json().catch(() => ({}))
 
       if (!overviewResponse.ok) {
         if (overviewResponse.status === 401) {
@@ -308,6 +320,10 @@ export default function DashboardPage() {
         // ignore if messages not available
       }
 
+      if (!Array.isArray(eboardData.members)) {
+        // ignore
+      }
+
       const allBlogPosts = Array.isArray(blogData.posts) ? (blogData.posts as BlogPostRecord[]) : []
       const allProjects = Array.isArray(projectData.projects) ? (projectData.projects as ProjectRecord[]) : []
 
@@ -328,6 +344,7 @@ export default function DashboardPage() {
       setRejectedPosts(rejectedBlogPosts)
       setRejectedProjects(rejectedProjectRows)
       setMessages(messagesData.messages || [])
+      setEboard(eboardData.members || [])
       setPasskeyStatus({
         configured: Boolean(passkeyData.configured),
         source: passkeyData.source || "none",
@@ -336,6 +353,7 @@ export default function DashboardPage() {
         currentHash: passkeyData.currentHash || null,
         hashLog: passkeyData.hashLog || [],
       })
+      setEboard(messagesData.eboard || [])
     } catch {
       setError("Unable to load dashboard")
     } finally {
@@ -538,6 +556,55 @@ export default function DashboardPage() {
       setError("Unable to update dashboard passkey")
     } finally {
       setSavingPasskey(false)
+    }
+  }
+
+  const createEboardMember = async (ev?: React.FormEvent) => {
+    if (ev) ev.preventDefault()
+    setMessage("")
+    setError("")
+
+    try {
+      const response = await fetch('/api/dashboard/eboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newEboardForm),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) { setError(payload.error || 'Unable to create member'); return }
+      setNewEboardForm({ name: '', role: '', bio: '', imageUrl: '', linkedin: '', github: '', order: 0 })
+      await load()
+    } catch {
+      setError('Unable to create member')
+    }
+  }
+
+  const updateEboardMember = async (id: string, data: any) => {
+    setMessage("")
+    setError("")
+    try {
+      const response = await fetch(`/api/dashboard/eboard/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(data) })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) { setError(payload.error || 'Unable to update member'); return }
+      setEditingEboardId(null)
+      await load()
+    } catch {
+      setError('Unable to update member')
+    }
+  }
+
+  const deleteEboardMember = async (id: string) => {
+    if (!confirm('Delete this member?')) return
+    setMessage("")
+    setError("")
+    try {
+      const response = await fetch(`/api/dashboard/eboard/${id}`, { method: 'DELETE', credentials: 'include' })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) { setError(payload.error || 'Unable to delete member'); return }
+      await load()
+    } catch {
+      setError('Unable to delete member')
     }
   }
 
@@ -1176,6 +1243,52 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+      </section>
+
+      <section className="mb-8">
+        <h2 className="mb-3 text-xl font-bold">Executive Board</h2>
+        <div className="glass rounded-2xl border border-[color:var(--border)] p-6">
+          <form onSubmit={createEboardMember} className="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input value={newEboardForm.name} onChange={(e) => setNewEboardForm((s) => ({ ...s, name: e.target.value }))} placeholder="Name" className="input" />
+            <input value={newEboardForm.role} onChange={(e) => setNewEboardForm((s) => ({ ...s, role: e.target.value }))} placeholder="Role" className="input" />
+            <input value={newEboardForm.instagram} onChange={(e) => setNewEboardForm((s) => ({ ...s, instagram: e.target.value }))} placeholder="Instagram URL or handle" className="input" />
+            <input value={newEboardForm.imageUrl} onChange={(e) => setNewEboardForm((s) => ({ ...s, imageUrl: e.target.value }))} placeholder="Image URL" className="input col-span-2" />
+            <input value={newEboardForm.bio} onChange={(e) => setNewEboardForm((s) => ({ ...s, bio: e.target.value }))} placeholder="Short description" className="input col-span-3" />
+            <div />
+            <button className="btn-primary">Add Member</button>
+          </form>
+
+          <div className="grid gap-3">
+            {eboard.map((m) => (
+              <div key={m.id} className="flex items-start justify-between gap-4 border-b pb-3">
+                <div className="min-w-0 flex gap-3 items-start">
+                  {m.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={m.imageUrl} alt={m.name} className="h-12 w-12 rounded-md object-cover" />
+                  ) : null}
+                  <div>
+                    <div className="font-bold">{m.name} <span className="text-xs text-[color:var(--muted-foreground)]">{m.role}</span></div>
+                    <div className="text-sm text-[color:var(--muted-foreground)] line-clamp-2">{m.bio}</div>
+                    {m.instagram ? <div className="text-xs text-[color:var(--primary)]">{m.instagram}</div> : null}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {editingEboardId === m.id ? (
+                    <>
+                      <button onClick={() => updateEboardMember(m.id, { name: m.name })} className="rounded bg-zinc-800 px-3 py-1 text-sm">Save</button>
+                      <button onClick={() => setEditingEboardId(null)} className="rounded border px-3 py-1 text-sm">Cancel</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => setEditingEboardId(m.id)} className="rounded border px-3 py-1 text-sm">Edit</button>
+                      <button onClick={() => deleteEboardMember(m.id)} className="rounded bg-red-700 px-3 py-1 text-sm">Delete</button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="mb-10 grid gap-6 lg:grid-cols-2">

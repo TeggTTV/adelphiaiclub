@@ -4,7 +4,7 @@ import { getCurrentUser, hasDashboardAccess, isDashboardAdminUser } from "@/lib/
 import { jsonError } from "@/lib/api"
 import { checkRateLimit, ipKey } from "@/lib/rateLimit"
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, context: any) {
   const user = await getCurrentUser()
   if (!isDashboardAdminUser(user)) {
     return jsonError("Admin access required", 403)
@@ -15,7 +15,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     return jsonError("Dashboard unlock required", 401)
   }
 
-  const { id } = params
+  const { id } = (context && context.params) ? context.params : { id: undefined }
   // Rate limit admin operations to avoid abuse: 60 updates per minute per admin
   try {
     const ipHeader = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || req.headers.get("cf-connecting-ip")

@@ -11,16 +11,22 @@ import { jsonError } from "@/lib/api"
 import { verifyPassword } from "@/lib/security"
 
 async function getDashboardPasskeySource() {
-  const dbSetting = await prisma.appSetting.findUnique({
-    where: { key: "dashboardPasskeyHash" },
-    select: { value: true },
+  // Prefer explicit DashboardHashRecord entries (newer flow)
+  const currentHashRecord = await prisma.dashboardHashRecord.findFirst({
+    where: { isCurrent: true },
+    orderBy: { createdAt: "desc" },
+    select: { hash: true },
   })
 
+  if (currentHashRecord?.hash) {
+    return { source: "db_record" as const, value: currentHashRecord.hash }
+  }
+
+  // Backcompat: fall back to appSetting named `dashboardPasskeyHash`
+  const dbSetting = await prisma.appSetting.findUnique({ where: { key: "dashboardPasskeyHash" }, select: { value: true } })
+
   if (dbSetting?.value) {
-    return {
-      source: "database" as const,
-      value: dbSetting.value,
-    }
+    return { source: "database" as const, value: dbSetting.value }
   }
 
   if (process.env.ADMIN_DASHBOARD_KEY_HASH) {
@@ -50,6 +56,10 @@ async function verifyAdminPasskey(passkey: string) {
     return verifyPassword(passkey, config.value)
   }
 
+  if (config.source === "db_record") {
+    return verifyPassword(passkey, config.value)
+  }
+
   if (config.source === "env_hash") {
     return verifyPassword(passkey, config.value)
   }
@@ -72,22 +82,22 @@ export async function POST(request: NextRequest) {
     const passkey = typeof body.passkey === "string" ? body.passkey : ""
 
     const config = await getDashboardPasskeySource()
-    const bootstrapBypass = config.source === "none"
 
-    if (!passkey && !bootstrapBypass) {
+    if (config.source === "none") {
+      return jsonError("Dashboard passkey is not configured", 400)
+    }
+
+    if (!passkey) {
       return jsonError("Passkey is required", 400)
     }
 
-    const matches = bootstrapBypass ? true : await verifyAdminPasskey(passkey)
+    const matches = await verifyAdminPasskey(passkey)
     if (!matches) {
       return jsonError("Invalid dashboard passkey", 401)
     }
 
     const access = createDashboardAccessValue(user.id)
-    const response = NextResponse.json({
-      success: true,
-      bootstrapBypass,
-    })
+    const response = NextResponse.json({ success: true })
 
     response.cookies.set(DASHBOARD_COOKIE_NAME, access.value, sessionCookieOptions(access.expiresAt))
 
