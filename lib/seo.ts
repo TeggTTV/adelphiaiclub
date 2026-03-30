@@ -5,8 +5,8 @@ const fallbackSiteUrl = 'https://adelphiaisociety.vercel.app'
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || fallbackSiteUrl
 
-export const SITE_NAME = 'Adelphi AI Society'
-export const DEFAULT_TITLE = 'Adelphi AI Society'
+export const SITE_NAME = 'AI Society'
+export const DEFAULT_TITLE = 'AI Society'
 export const DEFAULT_DESCRIPTION =
   "Adelphi University's Artificial Intelligence Society for builders, researchers, and creators."
 export const DEFAULT_OG_IMAGE = '/og-image.png'

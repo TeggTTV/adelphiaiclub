@@ -74,7 +74,7 @@ export default function EboardPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-[color:var(--muted-foreground)] max-w-3xl mx-auto leading-relaxed"
           >
-            Meet the passionate students leading the Adelphi AI Society. Dedicated to  a vibrant community and advancing AI initiatives on campus.
+            Meet the passionate students leading the AI Society. Dedicated to  a vibrant community and advancing AI initiatives on campus.
           </motion.p>
         </div>
       </section>

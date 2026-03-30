@@ -9,7 +9,7 @@ import { cn } from "@/components/Navbar"
 const faqs = [
   {
     question: "Do I need to be a Computer Science major to join?",
-    answer: "Not at all! The Adelphi AI Society is open to all majors. We believe AI intersects with every field, from business and healthcare to arts and humanities. We provide beginner-friendly resources to help anyone get started."
+    answer: "Not at all! The AI Society is open to all majors. We believe AI intersects with every field, from business and healthcare to arts and humanities. We provide beginner-friendly resources to help anyone get started."
   },
   {
     question: "Do I need prior coding experience?",
@@ -50,7 +50,7 @@ export default function FaqPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-[color:var(--muted-foreground)] max-w-3xl mx-auto leading-relaxed"
           >
-            Everything you need to know about the Adelphi AI Society.
+            Everything you need to know about the AI Society.
           </motion.p>
         </div>
       </section>

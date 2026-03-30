@@ -11,6 +11,7 @@ export default function SubmitProjectPage() {
   const [techStack, setTechStack] = React.useState("")
   const [tags, setTags] = React.useState("")
   const [creators, setCreators] = React.useState("")
+  const [email, setEmail] = React.useState("")
   const [projectState, setProjectState] = React.useState("Planning")
   const [difficulty, setDifficulty] = React.useState("Beginner")
   const [githubUrl, setGithubUrl] = React.useState("")
@@ -47,6 +48,7 @@ export default function SubmitProjectPage() {
           techStack,
           tags,
           creators,
+          email,
           projectState,
           difficulty,
           githubUrl,
@@ -66,6 +68,7 @@ export default function SubmitProjectPage() {
       setDescription("")
       setTechStack("")
       setTags("")
+      setEmail("")
       setCreators("")
       setGithubUrl("")
       setLiveUrl("")
@@ -141,6 +144,12 @@ export default function SubmitProjectPage() {
               value={techStack}
               onChange={(event) => setTechStack(event.target.value)}
               placeholder="Tech stack (comma separated)"
+              className="h-11 rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+            />
+            <input
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Optional contact email"
               className="h-11 rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
             />
             <input

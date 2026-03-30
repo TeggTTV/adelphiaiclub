@@ -78,6 +78,7 @@ model BlogPost {
   content          String
   encryptedContent String?
   excerpt          String?
+  contactEmail     String?
   authorId         String           @db.ObjectId
   approverId       String?          @db.ObjectId
   status           SubmissionStatus @default(PENDING)
@@ -113,6 +114,7 @@ model Project {
   techStack            String[]         @default([])
   tags                 String[]         @default([])
   creators             String[]         @default([])
+  contactEmail         String?
   status               SubmissionStatus @default(PENDING)
   projectState         String           @default("Planning")
   difficulty           String           @default("Beginner")

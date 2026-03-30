@@ -16,6 +16,7 @@ export default function SubmitBlogPage() {
   const [title, setTitle] = React.useState("")
   const [excerpt, setExcerpt] = React.useState("")
   const [tags, setTags] = React.useState("")
+  const [email, setEmail] = React.useState("")
   const [content, setContent] = React.useState("")
   const [message, setMessage] = React.useState("")
   const [error, setError] = React.useState("")
@@ -45,6 +46,7 @@ export default function SubmitBlogPage() {
           title,
           excerpt,
           tags,
+          email,
           content,
         }),
       })
@@ -58,6 +60,7 @@ export default function SubmitBlogPage() {
       setTitle("")
       setExcerpt("")
       setTags("")
+      setEmail("")
       setContent("")
       setMessage("Submission sent. An admin will review your post.")
     } catch {
@@ -126,6 +129,12 @@ export default function SubmitBlogPage() {
             value={tags}
             onChange={(event) => setTags(event.target.value)}
             placeholder="Tags (comma separated)"
+            className="h-11 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
+          />
+          <input
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="Optional contact email"
             className="h-11 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
           />
           <textarea

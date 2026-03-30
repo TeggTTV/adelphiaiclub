@@ -6,7 +6,7 @@ export function EasterEggs() {
   React.useEffect(() => {
     // Easter Egg 1: Console Message
     console.log(
-      "%c🤖 Welcome to the Adelphi AI Society! 🤖",
+      "%c🤖 Welcome to the AI Society! 🤖",
       "color: #818cf8; font-size: 20px; font-weight: bold; background: #0a0a0a; padding: 10px; border-radius: 5px;"
     )
     console.log("If you're reading this, you should probably join our dev team. Email us at aisociety@adelphi.edu")

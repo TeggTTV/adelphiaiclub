@@ -15,7 +15,7 @@ import {
 const clubFacts = [
 	{
 		title: 'Who We Are',
-		body: 'Adelphi AI Society is a student-led organization focused on practical AI learning, creative experimentation, and interdisciplinary collaboration.',
+		body: 'AI Society is a student-led organization focused on practical AI learning, creative experimentation, and interdisciplinary collaboration.',
 		icon: Users,
 	},
 	{
@@ -44,7 +44,7 @@ export default function AboutPage() {
 					>
 						About{' '}
 						<span className="text-gradient">
-							Adelphi AI Society
+							AI Society
 						</span>
 					</motion.h1>
 					<motion.p

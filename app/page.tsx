@@ -234,7 +234,7 @@ export default function Home() {
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[color:var(--primary)] to-transparent opacity-50" />
             <h2 className="text-2xl md:text-3xl font-bold mb-6">Shaping the Future Together</h2>
             <p className="text-lg text-[color:var(--muted-foreground)] mb-8 leading-relaxed">
-              The Adelphi AI Society is dedicated to demystifying artificial intelligence and providing students with hands-on experience in machine learning, data science, and software engineering. Whether you&apos;re a beginner or an expert, there&apos;s a place for you here.
+              The AI Society is dedicated to demystifying artificial intelligence and providing students with hands-on experience in machine learning, data science, and software engineering. Whether you&apos;re a beginner or an expert, there&apos;s a place for you here.
             </p>
             <Link href="/about" className="inline-flex items-center gap-2 text-[color:var(--primary)] font-bold hover:underline underline-offset-4">
               Learn More About Us <ChevronRight className="w-4 h-4" />
@@ -320,7 +320,7 @@ export default function Home() {
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Meet the Executive Board</h2>
             <p className="text-[color:var(--muted-foreground)] max-w-2xl mx-auto">
-              The dedicated team driving the vision and operations of the Adelphi AI Society.
+              The dedicated team driving the vision and operations of the AI Society.
             </p>
           </div>
 

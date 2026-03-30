@@ -1,4 +1,4 @@
-// Placeholder data for Adelphi AI Society
+// Placeholder data for AI Society
 
 export const eboardMembers = [
 	{
@@ -278,10 +278,10 @@ export const projects: Project[] = [
 export const blogPosts = [
   {
     id: "1",
-    title: "Welcome to the Adelphi AI Society",
+    title: "Welcome to the AI Society",
     slug: "welcome-to-adelphi-ai-society",
-    content: "We are thrilled to announce the launch of the Adelphi AI Society! Our mission is to foster a community of students passionate about artificial intelligence, machine learning, and data science. Stay tuned for upcoming events, workshops, and projects.",
-    excerpt: "We are thrilled to announce the launch of the Adelphi AI Society!",
+    content: "We are thrilled to announce the launch of the AI Society! Our mission is to foster a community of students passionate about artificial intelligence, machine learning, and data science. Stay tuned for upcoming events, workshops, and projects.",
+    excerpt: "We are thrilled to announce the launch of the AI Society!",
     author: "Santiago Rodriguez",
     createdAt: new Date("2026-03-01T12:00:00Z"),
     updatedAt: new Date("2026-03-01T12:00:00Z"),

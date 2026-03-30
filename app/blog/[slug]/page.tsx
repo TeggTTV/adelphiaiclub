@@ -8,7 +8,8 @@ import { SITE_NAME, SITE_URL, createPageMetadata, getCanonicalUrl } from "@/lib/
 
 function buildToc(content: string) {
   const toc: Array<{ id: string; text: string; level: number }> = []
-  const regex = /^(#{2,3})\s+(.*)$/gm
+  // include single '#' headings so they are picked up if present
+  const regex = /^(#{1,3})\s+(.*)$/gm
   let match: RegExpExecArray | null
 
   while ((match = regex.exec(content)) !== null) {
@@ -152,6 +153,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <User className="h-4 w-4 text-[color:var(--primary)]" />
               {post.author.name}
             </span>
+            {post.contactEmail && (
+              <span className="inline-flex items-center gap-1.5">
+                <a href={`mailto:${post.contactEmail}`} className="text-sm font-semibold text-[color:var(--primary)]">{post.contactEmail}</a>
+              </span>
+            )}
           </div>
 
           <h1 className="text-4xl font-black tracking-tight md:text-6xl">{post.title}</h1>
@@ -169,6 +175,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {post.content.split("\n").map((paragraph, index) => {
             const trimmed = paragraph.trim()
             if (!trimmed) return <div key={index} className="h-4" />
+
+            // Support H1/H2/H3 markdown-style headings in the content.
+            if (trimmed.startsWith("# ")) {
+              const text = trimmed.slice(2).trim()
+              const id = text.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+              // avoid rendering a duplicate H1 if it matches post.title
+              if (text === post.title) {
+                return null
+              }
+              return (
+                <h1 key={index} id={id} className="mt-6 text-3xl font-black">
+                  {text}
+                </h1>
+              )
+            }
 
             if (trimmed.startsWith("## ")) {
               const text = trimmed.slice(3)

@@ -40,7 +40,7 @@ const Testimonials = () => {
 						Hear from our Members
 					</h2>
 					<p className="text-gray-400 max-w-2xl mx-auto">
-						See how the Adelphi AI Society is impacting
+						See how the AI Society is impacting
 						students&apos; lives and careers.
 					</p>
 				</motion.div>

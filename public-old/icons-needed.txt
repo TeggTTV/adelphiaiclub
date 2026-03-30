@@ -8,7 +8,7 @@ Please create and add the following icon files to the /public directory:
 4. apple-touch-icon.png (180x180) - iOS home screen icon
 5. og-image.jpg (1200x630) - Social media sharing image
 
-All icons should use the Adelphi AI Society branding with the blue/purple gradient theme.
+All icons should use the AI Society branding with the blue/purple gradient theme.
 
 Suggested design elements:
 - AI/technology themed iconography

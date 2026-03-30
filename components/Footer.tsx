@@ -10,12 +10,12 @@ export function Footer() {
           <Link href="/" className="flex items-center gap-2 group w-fit">
             <Image
               src="/TRANSPARENT ICON.png"
-              alt="Adelphi AI Society logo"
+              alt="AI Society logo"
               width={28}
               height={28}
               className="h-7 w-7 object-contain group-hover:scale-105 transition-transform"
             />
-            <span className="font-bold text-lg tracking-tighter">Adelphi AI Society</span>
+            <span className="font-bold text-lg tracking-tighter">AI Society</span>
           </Link>
           <p className="text-[color:var(--muted-foreground)] text-sm max-w-sm">
             Innovate, Create, Explore. Join our community in the exploration of Artificial Intelligence as a way to amplify innovation, creativity, and growth.
@@ -50,7 +50,7 @@ export function Footer() {
             </a>
           </div>
           <p className="text-xs text-[color:var(--muted-foreground)] mt-4">
-            &copy; {new Date().getFullYear()} Adelphi AI Society. All rights reserved.
+            &copy; {new Date().getFullYear()} AI Society. All rights reserved.
           </p>
         </div>
       </div>

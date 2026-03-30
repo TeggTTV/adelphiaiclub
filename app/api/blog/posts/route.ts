@@ -76,6 +76,7 @@ export async function GET(request: NextRequest) {
       rejectedReason: post.rejectedReason,
       authorId: post.authorId,
       authorName: post.author.name,
+      contactEmail: (post as any).contactEmail || null,
       content:
         scope === "all" || scope === "mine"
           ? post.content || decryptFromStorage(post.encryptedContent)
@@ -113,6 +114,7 @@ export async function POST(request: NextRequest) {
         encryptedContent: encryptForStorage(content),
         excerpt: finalExcerpt,
         tags,
+        contactEmail: typeof body.email === 'string' && body.email.trim() ? body.email.trim() : null,
         authorId: user.id,
         status: SubmissionStatus.PENDING,
         published: false,

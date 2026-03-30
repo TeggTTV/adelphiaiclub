@@ -50,9 +50,9 @@ export async function POST(request: NextRequest) {
     if (resendApiKey) {
       const resend = new Resend(resendApiKey)
       await resend.emails.send({
-        from: "Adelphi AI Society <onboarding@resend.dev>",
+        from: "AI Society <onboarding@resend.dev>",
         to: [user.email],
-        subject: "Reset your Adelphi AI Society password",
+        subject: "Reset your AI Society password",
         text: `Hi ${user.name},\n\nUse this link to reset your password:\n${resetUrl}\n\nThis link expires in ${PASSWORD_RESET_TTL_MINUTES} minutes.`,
       })
     } else {

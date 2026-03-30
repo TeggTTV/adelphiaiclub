@@ -41,7 +41,7 @@ export function generateSEO({
 
   const allKeywords = [...defaultKeywords, ...keywords];
   
-  const seoTitle = title ? `${title} | Adelphi AI Society` : 'Adelphi AI Society';
+  const seoTitle = title ? `${title} | AI Society` : 'AI Society';
   const seoDescription = description || 'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University. Join our community of students and faculty exploring artificial intelligence through workshops, hackathons, and guest speakers.';
   
   return {
@@ -57,7 +57,7 @@ export function generateSEO({
       url: canonical ? `${baseUrl}${canonical}` : baseUrl,
       title: seoTitle,
       description: seoDescription,
-      siteName: 'Adelphi AI Society',
+      siteName: 'AI Society',
       images: [
         {
           url: ogImage,
@@ -111,14 +111,14 @@ export const pageSEO = {
   
   about: generateSEO({
     title: 'About Us',
-    description: 'Learn about Adelphi AI Society\'s mission to empower minds and shape futures through artificial intelligence education and innovation.',
+    description: 'Learn about AI Society\'s mission to empower minds and shape futures through artificial intelligence education and innovation.',
     keywords: ['about', 'mission', 'AI education', 'artificial intelligence society'],
     canonical: '/about',
   }),
   
   contact: generateSEO({
     title: 'Contact Us',
-    description: 'Get in touch with Adelphi AI Society. Join our community or learn more about our AI education initiatives.',
+    description: 'Get in touch with AI Society. Join our community or learn more about our AI education initiatives.',
     keywords: ['contact', 'join', 'membership', 'AI community'],
     canonical: '/contact',
   }),

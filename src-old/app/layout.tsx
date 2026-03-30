@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: {
-		default: 'Adelphi AI Society',
-		template: '%s | Adelphi AI Society',
+		default: 'AI Society',
+		template: '%s | AI Society',
 	},
 	description:
 		'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University. Join our community of students and faculty exploring artificial intelligence through workshops, hackathons, and guest speakers.',
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
 		'Workshops',
 		'Hackathons',
 	],
-	authors: [{ name: 'Adelphi AI Society' }],
-	creator: 'Adelphi AI Society',
-	publisher: 'Adelphi AI Society',
+	authors: [{ name: 'AI Society' }],
+	creator: 'AI Society',
+	publisher: 'AI Society',
 	metadataBase: new URL('https://adelphiaisociety.vercel.app'),
 	alternates: {
 		canonical: '/',
@@ -46,22 +46,22 @@ export const metadata: Metadata = {
 		type: 'website',
 		locale: 'en_US',
 		url: 'https://adelphiaisociety.vercel.app',
-		title: 'Adelphi AI Society',
+		title: 'AI Society',
 		description:
 			'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University. Join our community of students and faculty exploring artificial intelligence.',
-		siteName: 'Adelphi AI Society',
+		siteName: 'AI Society',
 		images: [
 			{
 				url: '/og-image.png',
 				width: 1200,
 				height: 630,
-				alt: 'Adelphi AI Society - Empowering Minds, Shaping Futures',
+				alt: 'AI Society - Empowering Minds, Shaping Futures',
 			},
 		],
 	},
 	twitter: {
 		card: 'summary_large_image',
-		title: 'Adelphi AI Society',
+		title: 'AI Society',
 		description:
 			'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University.',
 		images: ['/og-image.png'],

@@ -16,7 +16,7 @@ export default function Home() {
 			<StructuredData
 				type="webpage"
 				data={{
-					title: 'Adelphi AI Society - Empowering Minds, Shaping Futures',
+					title: 'AI Society - Empowering Minds, Shaping Futures',
 					description:
 						"Join Adelphi University's premier artificial intelligence society. Explore AI through workshops, hackathons, guest speakers, and hands-on learning experiences.",
 				}}

@@ -1,4 +1,4 @@
-# SEO Implementation for Adelphi AI Society
+# SEO Implementation for AI Society
 
 ## ✅ Completed Implementation
 

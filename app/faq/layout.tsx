@@ -5,7 +5,7 @@ import { createPageMetadata } from '@/lib/seo'
 export const metadata: Metadata = createPageMetadata({
   title: 'Frequently Asked Questions',
   description:
-    'Get answers to common questions about membership, meetings, events, and participation in Adelphi AI Society.',
+    'Get answers to common questions about membership, meetings, events, and participation in AI Society.',
   path: '/faq',
   keywords: ['AI club FAQ', 'Adelphi membership questions', 'student tech club info'],
 })

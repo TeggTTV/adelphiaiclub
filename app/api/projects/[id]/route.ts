@@ -38,6 +38,7 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
 
     const title = typeof body.title === "string" ? body.title.trim() : undefined
     const description = typeof body.description === "string" ? body.description.trim() : undefined
+    const contactEmail = typeof body.email === "string" ? (body.email.trim() || undefined) : undefined
 
     const updated = await prisma.project.update({
       where: { id },
@@ -49,6 +50,7 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
               encryptedDescription: encryptForStorage(description),
             }
           : {}),
+        ...(contactEmail !== undefined ? { contactEmail } : {}),
         ...(body.techStack !== undefined ? { techStack: parseTags(body.techStack) } : {}),
         ...(body.tags !== undefined ? { tags: parseTags(body.tags) } : {}),
         ...(body.creators !== undefined ? { creators: parseTags(body.creators) } : {}),

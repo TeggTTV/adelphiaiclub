@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 export const metadata: Metadata = {
 	title: 'Privacy Policy',
 	description:
-		'Privacy policy for Adelphi AI Society website and data handling practices.',
+		'Privacy policy for AI Society website and data handling practices.',
 };
 
 export default function PrivacyPage() {

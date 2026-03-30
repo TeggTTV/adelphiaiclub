@@ -40,6 +40,7 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
     const content = typeof body.content === "string" ? body.content.trim() : undefined
     const excerpt = typeof body.excerpt === "string" ? body.excerpt.trim() : undefined
     const tags = body.tags !== undefined ? parseTags(body.tags) : undefined
+    const contactEmail = typeof body.email === "string" ? (body.email.trim() || undefined) : undefined
 
     const updated = await prisma.blogPost.update({
       where: { id },
@@ -48,6 +49,7 @@ export async function PATCH(request: NextRequest, context: RouteParams) {
         ...(content ? { content, encryptedContent: encryptForStorage(content) } : {}),
         ...(excerpt !== undefined ? { excerpt } : {}),
         ...(tags ? { tags } : {}),
+        ...(contactEmail !== undefined ? { contactEmail } : {}),
         ...(!isAdmin
           ? {
               status: SubmissionStatus.PENDING,

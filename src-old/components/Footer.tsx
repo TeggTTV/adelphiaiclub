@@ -70,13 +70,13 @@ const Footer = () => {
 					>
 						<Image
 							src="/TRANSPARENT ICON.png"
-							alt="Adelphi AI Society Logo"
+							alt="AI Society Logo"
 							width={80}
 							height={80}
 							className="w-16 h-16 sm:w-20 sm:h-20 mb-4"
 						/>
 						<h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
-							Adelphi AI Society
+							AI Society
 						</h2>
 					</motion.div>
 
@@ -166,7 +166,7 @@ const Footer = () => {
 									Organization
 								</h3>
 								<p className="text-white/70 text-xs sm:text-sm">
-									Adelphi AI Society
+									AI Society
 								</p>
 							</div>
 							<div>
@@ -197,7 +197,7 @@ const Footer = () => {
 						transition={{ delay: 0.8 }}
 						className="text-white/50 text-xs sm:text-sm"
 					>
-						<p>© 2025 Adelphi AI Society. All rights reserved.</p>
+						<p>© 2025 AI Society. All rights reserved.</p>
 					</motion.div>
 				</div>
 			</div>

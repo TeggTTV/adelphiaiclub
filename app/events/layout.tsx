@@ -5,7 +5,7 @@ import { createPageMetadata } from '@/lib/seo'
 export const metadata: Metadata = createPageMetadata({
   title: 'AI Events and Workshops',
   description:
-    'Explore upcoming Adelphi AI Society workshops, competitions, and community events open to students.',
+    'Explore upcoming AI Society workshops, competitions, and community events open to students.',
   path: '/events',
   keywords: ['AI events', 'Adelphi workshops', 'student tech events'],
 })

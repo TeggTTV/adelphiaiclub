@@ -62,7 +62,7 @@ const NavBar = () => {
 							<div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 							<Image
 								src="/TRANSPARENT ICON.png"
-								alt="Adelphi AI Society Logo"
+								alt="AI Society Logo"
 								width={48}
 								height={48}
 								className="w-10 h-10 sm:w-12 sm:h-12 relative z-10"

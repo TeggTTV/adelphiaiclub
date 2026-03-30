@@ -53,7 +53,7 @@ const ContactForm = () => {
 							Join Us on MyAULife
 						</h2>
 						<p className="text-white/70 text-sm sm:text-base md:text-lg">
-							Become an official member of the Adelphi AI Society.
+							Become an official member of the AI Society.
 							Connect with us, stay updated on events, and be part
 							of our community.
 						</p>

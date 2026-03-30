@@ -61,7 +61,7 @@ const Hero = () => {
 				{/* Main Heading */}
 				<motion.div style={{ opacity, y }} className="mb-6 max-w-4xl">
 					<SplitText
-						text="Adelphi AI Society"
+						text="AI Society"
 						className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tighter text-white mb-2"
 						delay={50}
 						duration={1}

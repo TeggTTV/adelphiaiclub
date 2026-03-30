@@ -3,9 +3,9 @@ import type { ReactNode } from 'react'
 import { createPageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = createPageMetadata({
-  title: 'Join Adelphi AI Society',
+  title: 'Join AI Society',
   description:
-    'Join Adelphi AI Society to build practical AI skills, collaborate on projects, and attend exclusive workshops.',
+    'Join AI Society to build practical AI skills, collaborate on projects, and attend exclusive workshops.',
   path: '/join',
   keywords: ['join AI club', 'Adelphi student organizations', 'AI community'],
 })

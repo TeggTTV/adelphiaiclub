@@ -17,7 +17,7 @@ const StructuredData = ({ type = 'organization', data = {} }: StructuredDataProp
       return {
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: 'Adelphi AI Society',
+        name: 'AI Society',
         alternateName: 'Adelphi Artificial Intelligence Society',
         url: baseUrl,
         logo: `${baseUrl}/DARK LOGO.png`,
@@ -66,17 +66,17 @@ const StructuredData = ({ type = 'organization', data = {} }: StructuredDataProp
       return {
         '@context': 'https://schema.org',
         '@type': 'WebPage',
-        name: data.title || 'Adelphi AI Society',
+        name: data.title || 'AI Society',
         description: data.description || 'Empowering Minds, Shaping Futures: AI Education and Innovation at Adelphi University',
         url: `${baseUrl}${pathname}`,
         isPartOf: {
           '@type': 'WebSite',
-          name: 'Adelphi AI Society',
+          name: 'AI Society',
           url: baseUrl
         },
         about: {
           '@type': 'Organization',
-          name: 'Adelphi AI Society'
+          name: 'AI Society'
         },
         ...data
       };
@@ -86,7 +86,7 @@ const StructuredData = ({ type = 'organization', data = {} }: StructuredDataProp
       return {
         '@context': 'https://schema.org',
         '@type': 'Event',
-        name: data.name || 'Adelphi AI Society Event',
+        name: data.name || 'AI Society Event',
         description: data.description || 'Join us for an exciting AI-focused event',
         startDate: data.startDate,
         endDate: data.endDate,
@@ -104,7 +104,7 @@ const StructuredData = ({ type = 'organization', data = {} }: StructuredDataProp
         },
         organizer: {
           '@type': 'Organization',
-          name: 'Adelphi AI Society',
+          name: 'AI Society',
           url: baseUrl
         },
         ...data

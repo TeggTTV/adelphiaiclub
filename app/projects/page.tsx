@@ -16,6 +16,7 @@ import {
   Tag,
   UserRound,
 } from "lucide-react"
+import PreviewModal from "@/components/PreviewModal"
 
 type SortMode = "featured" | "recent" | "title"
 
@@ -26,6 +27,7 @@ type Project = {
   techStack: string[]
   tags: string[]
   creators: string[]
+  contactEmail?: string | null
   status: "PENDING" | "APPROVED" | "REJECTED"
   projectState: "Planning" | "Research" | "In Progress" | "Launched" | string
   difficulty: "Beginner" | "Intermediate" | "Advanced" | string
@@ -55,6 +57,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = React.useState<Project[]>([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
+  const [previewProject, setPreviewProject] = React.useState<Project | null>(null)
 
   const [query, setQuery] = React.useState("")
   const [activeCreator, setActiveCreator] = React.useState("All creators")
@@ -135,6 +138,7 @@ export default function ProjectsPage() {
     (query.trim() ? 1 : 0)
 
   const featuredCount = projects.filter((project) => project.featured).length
+  const featuredProject = projects.find((p) => p.featured)
 
   const toggleTech = (tech: string) => {
     setActiveTech((current) =>
@@ -168,7 +172,7 @@ export default function ProjectsPage() {
               Build Fast. Learn Loud. <span className="text-cyan-200">Ship Together.</span>
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-slate-200/85 md:text-xl">
-              Explore approved builds from Adelphi AI Society members.
+              Explore approved builds from AI Society members.
             </p>
           </motion.div>
 
@@ -193,6 +197,38 @@ export default function ProjectsPage() {
           </motion.div>
         </div>
       </section>
+
+      {featuredProject && (
+        <article className="group relative mb-14 mx-auto max-w-7xl px-4 py-8">
+          <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-[color:var(--primary)] via-cyan-500 to-emerald-500 opacity-20 blur transition-opacity duration-500 group-hover:opacity-40" />
+          <div className="relative overflow-hidden rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] p-8 md:p-10">
+            <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--primary)] px-3 py-1 font-bold text-[color:var(--primary-foreground)]">
+                <Sparkles className="h-3.5 w-3.5" /> Featured
+              </span>
+              <span className="rounded-full border border-[color:var(--border)] px-3 py-1 text-[color:var(--muted-foreground)]">
+                <span className="inline-flex items-center gap-1">
+                  <CalendarClock className="h-3.5 w-3.5" />
+                  {new Date(featuredProject.updatedAt).toLocaleDateString()}
+                </span>
+              </span>
+            </div>
+
+            <h2 className="text-3xl font-black tracking-tight md:text-4xl">
+              <Link href={`/projects/${featuredProject.slug}`} className="transition-colors hover:text-[color:var(--primary)]">
+                {featuredProject.title}
+              </Link>
+            </h2>
+            <p className="mt-4 max-w-3xl text-[color:var(--muted-foreground)]">{featuredProject.description}</p>
+            <Link href={`/projects/${featuredProject.slug}`} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[color:var(--primary)] px-5 py-2.5 text-sm font-bold text-[color:var(--primary-foreground)]">
+              View Project
+            </Link>
+            {featuredProject.contactEmail && (
+              <p className="mt-3 text-sm text-[color:var(--muted-foreground)]">Contact: <a href={`mailto:${featuredProject.contactEmail}`} className="font-semibold text-[color:var(--primary)]">{featuredProject.contactEmail}</a></p>
+            )}
+          </div>
+        </article>
+      )}
 
       <section className="bg-[color:var(--muted)]/25 py-16">
         <div className="container mx-auto max-w-6xl px-4 md:px-6">
@@ -336,13 +372,15 @@ export default function ProjectsPage() {
           ) : (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {filteredProjects.map((project, index) => (
-                <motion.div
+                <div
                   key={project.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.06 }}
-                  className="group flex h-full flex-col overflow-hidden rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] shadow-lg transition hover:-translate-y-1 hover:border-[color:var(--primary)]"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setPreviewProject(project)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') setPreviewProject(project)
+                  }}
+                  className="cursor-pointer group flex h-full flex-col overflow-hidden rounded-3xl border border-[color:var(--border)] bg-[color:var(--card)] shadow-lg transition hover:-translate-y-1 hover:border-[color:var(--primary)]"
                 >
                   <div className="relative flex h-40 items-center justify-center overflow-hidden border-b border-[color:var(--border)] bg-[linear-gradient(135deg,rgba(99,102,241,0.07),rgba(6,182,212,0.08),rgba(16,185,129,0.08))]">
                     <div className="absolute left-4 top-4 flex items-center gap-2">
@@ -380,7 +418,6 @@ export default function ProjectsPage() {
                         <Sparkles className="h-3.5 w-3.5" />
                         {project.difficulty}
                       </span>
-                      <span className={cn("font-semibold", difficultyStyles[project.difficulty] || "text-slate-300")}>{project.difficulty}</span>
                     </div>
 
                     <div className="mb-5 flex flex-wrap gap-2">
@@ -400,7 +437,10 @@ export default function ProjectsPage() {
                         <button
                           key={creator}
                           type="button"
-                          onClick={() => setActiveCreator(creator)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setActiveCreator(creator)
+                          }}
                           className="rounded-full border border-[color:var(--border)] bg-[color:var(--background)] px-2.5 py-1 text-xs font-semibold transition hover:border-[color:var(--primary)] hover:text-[color:var(--primary)]"
                         >
                           {creator}
@@ -408,12 +448,21 @@ export default function ProjectsPage() {
                       ))}
                     </div>
 
+                    {project.contactEmail && (
+                      <div className="mb-4 text-sm text-[color:var(--muted-foreground)]">
+                        Contact: <a href={`mailto:${project.contactEmail}`} className="font-semibold text-[color:var(--primary)]">{project.contactEmail}</a>
+                      </div>
+                    )}
+
                     <div className="mb-6 flex flex-wrap gap-2">
                       {project.techStack.map((tech) => (
                         <button
                           key={tech}
                           type="button"
-                          onClick={() => toggleTech(tech)}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleTech(tech)
+                          }}
                           className={cn(
                             "rounded-full border px-3 py-1 text-xs font-semibold transition",
                             activeTech.includes(tech)
@@ -432,6 +481,7 @@ export default function ProjectsPage() {
                           href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
                           className="flex items-center gap-2 text-sm font-bold transition-colors hover:text-[color:var(--primary)]"
                         >
                           <Code className="h-4 w-4" /> Source Code
@@ -442,6 +492,7 @@ export default function ProjectsPage() {
                           href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
                           className="ml-auto flex items-center gap-2 text-sm font-bold transition-colors hover:text-[color:var(--primary)]"
                         >
                           Live Demo <ExternalLink className="h-4 w-4" />
@@ -449,8 +500,41 @@ export default function ProjectsPage() {
                       )}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
+              {previewProject && (
+                <PreviewModal
+                  title={previewProject.title}
+                  subtitle={previewProject.creators?.join(', ')}
+                  onClose={() => setPreviewProject(null)}
+                >
+                  <div className="space-y-4">
+                    {previewProject.imageUrl && (
+                      <img src={previewProject.imageUrl} alt={previewProject.title} className="w-full rounded-md object-cover" />
+                    )}
+                    <p className="text-sm text-[color:var(--muted-foreground)]">{previewProject.description}</p>
+                    {previewProject.impact && (
+                      <div className="rounded-lg border border-[color:var(--border)] bg-[color:var(--background)] p-3 text-sm">{previewProject.impact}</div>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                      {previewProject.techStack.map((t) => (
+                        <span key={t} className="rounded-full bg-[color:var(--background)]/60 px-3 py-1 text-xs font-semibold">{t}</span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {previewProject.githubUrl && (
+                        <a href={previewProject.githubUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] px-4 py-2 text-sm font-semibold">Source</a>
+                      )}
+                      {previewProject.liveUrl && (
+                        <a href={previewProject.liveUrl} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] px-4 py-2 text-sm font-semibold">Live Demo</a>
+                      )}
+                      {previewProject.contactEmail && (
+                        <a className="ml-auto text-sm font-semibold text-[color:var(--primary)]" href={`mailto:${previewProject.contactEmail}`} onClick={(e) => e.stopPropagation()}>{previewProject.contactEmail}</a>
+                      )}
+                    </div>
+                  </div>
+                </PreviewModal>
+              )}
             </div>
           )}
         </div>

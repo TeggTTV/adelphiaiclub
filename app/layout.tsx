@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
 import { EasterEggs } from '@/components/EasterEggs';
+import { BackgroundAnimation } from '@/components/BackgroundAnimation';
 import { AdminDashboardAccess } from '@/components/AdminDashboardAccess';
 import {
   DEFAULT_DESCRIPTION,
@@ -31,7 +32,7 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   keywords: [
     'Adelphi University',
-    'Adelphi AI Society',
+    'AI Society',
     'Artificial Intelligence Club',
     'Machine Learning',
     'Student Organization',
@@ -135,6 +136,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <Footer />
           <EasterEggs />
+          <BackgroundAnimation />
           <AdminDashboardAccess />
         </ThemeProvider>
         <Analytics />

@@ -51,7 +51,7 @@ export default function SignInPage() {
       <div className="glass w-full max-w-md rounded-2xl border border-[color:var(--border)] p-8">
         <h1 className="text-3xl font-black tracking-tight">Sign In</h1>
         <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
-          Access your Adelphi AI Society account.
+          Access your AI Society account.
         </p>
 
         <form onSubmit={submit} className="mt-6 space-y-4">

@@ -130,12 +130,12 @@ export function Navbar() {
         <Link href="/" className="flex items-center gap-3 group">
           <Image
             src="/TRANSPARENT ICON.png"
-            alt="Adelphi AI Society logo"
+            alt="AI Society logo"
             width={32}
             height={32}
             className="h-8 w-8 object-contain group-hover:scale-105 transition-transform"
           />
-          <span className="font-bold text-lg tracking-tighter">Adelphi AI Society</span>
+          <span className="font-bold text-lg tracking-tighter">AI Society</span>
         </Link>
 
         {/* Desktop Nav */}

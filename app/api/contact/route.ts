@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const resend = new Resend(apiKey)
 
     const data = await resend.emails.send({
-      from: "Adelphi AI Society <onboarding@resend.dev>",
+      from: "AI Society <onboarding@resend.dev>",
       to: ["aisociety@adelphi.edu"],
       subject: `New Contact Form Submission from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
