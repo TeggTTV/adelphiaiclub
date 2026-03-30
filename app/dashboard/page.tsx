@@ -165,6 +165,15 @@ export default function DashboardPage() {
   const [approvedProjects, setApprovedProjects] = React.useState<ProjectRecord[]>([])
   const [rejectedPosts, setRejectedPosts] = React.useState<BlogPostRecord[]>([])
   const [rejectedProjects, setRejectedProjects] = React.useState<ProjectRecord[]>([])
+  const [messages, setMessages] = React.useState<Array<{
+    id: string
+    name: string
+    email: string
+    subject?: string | null
+    body: string
+    read: boolean
+    createdAt: string
+  }>>([])
   const [previewPost, setPreviewPost] = React.useState<BlogPostRecord | null>(null)
   const [previewProject, setPreviewProject] = React.useState<ProjectRecord | null>(null)
   const [editingPost, setEditingPost] = React.useState<BlogPostRecord | null>(null)
@@ -253,6 +262,7 @@ export default function DashboardPage() {
         fetch("/api/dashboard/security/passkey", { credentials: "include" }),
         fetch("/api/blog/posts?scope=all", { credentials: "include" }),
         fetch("/api/projects?scope=all", { credentials: "include" }),
+          fetch("/api/dashboard/messages", { credentials: "include" }),
       ])
 
       const overviewData = await overviewResponse.json().catch(() => ({}))
@@ -261,6 +271,7 @@ export default function DashboardPage() {
       const passkeyData = await passkeyResponse.json().catch(() => ({}))
       const blogData = await blogResponse.json().catch(() => ({}))
       const projectData = await projectResponse.json().catch(() => ({}))
+      const messagesData = await (await fetch("/api/dashboard/messages", { credentials: "include" })).json().catch(() => ({}))
 
       if (!overviewResponse.ok) {
         if (overviewResponse.status === 401) {
@@ -293,6 +304,10 @@ export default function DashboardPage() {
         setError(projectData.error || "Unable to load projects")
       }
 
+      if (!Array.isArray(messagesData.messages)) {
+        // ignore if messages not available
+      }
+
       const allBlogPosts = Array.isArray(blogData.posts) ? (blogData.posts as BlogPostRecord[]) : []
       const allProjects = Array.isArray(projectData.projects) ? (projectData.projects as ProjectRecord[]) : []
 
@@ -312,6 +327,7 @@ export default function DashboardPage() {
       setApprovedProjects(approvedProjectRows)
       setRejectedPosts(rejectedBlogPosts)
       setRejectedProjects(rejectedProjectRows)
+      setMessages(messagesData.messages || [])
       setPasskeyStatus({
         configured: Boolean(passkeyData.configured),
         source: passkeyData.source || "none",
@@ -745,6 +761,28 @@ export default function DashboardPage() {
     }
   }
 
+  const markMessageRead = async (id: string) => {
+    setMessage("")
+    setError("")
+
+    try {
+      const response = await fetch(`/api/dashboard/messages/${id}`, {
+        method: "PATCH",
+        credentials: "include",
+      })
+
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        setError(payload.error || "Unable to mark message")
+        return
+      }
+
+      setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, read: true } : m)))
+    } catch {
+      setError("Unable to mark message")
+    }
+  }
+
   const deleteProject = async (id: string) => {
     const confirmed = window.confirm("Delete this approved project?")
     if (!confirmed) return
@@ -1088,6 +1126,57 @@ export default function DashboardPage() {
         <StatCard label="Rejected Projects" value={String(rejectedProjects.length)} /> */}
         <StatCard label="Files" value={String(files.length)} />
       </div>
+
+      <section className="mb-8">
+        <h2 className="mb-3 text-xl font-bold">Contact Messages</h2>
+        {messages.length === 0 ? (
+          <div className="glass rounded-2xl border border-[color:var(--border)] p-6 text-sm text-[color:var(--muted-foreground)]">No messages yet.</div>
+        ) : (
+          <div className="grid gap-4">
+            {messages.map((m) => (
+              <div
+                key={m.id}
+                role={m.read ? undefined : "button"}
+                tabIndex={m.read ? -1 : 0}
+                onKeyDown={(e) => {
+                  if (!m.read && (e.key === "Enter" || e.key === " ")) {
+                    void markMessageRead(m.id)
+                  }
+                }}
+                onClick={() => {
+                  if (!m.read) void markMessageRead(m.id)
+                }}
+                className={`glass rounded-2xl border border-[color:var(--border)] p-4 ${m.read ? 'cursor-default' : 'cursor-pointer'}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold">{m.name} <span className="ml-2 text-xs text-[color:var(--muted-foreground)]">{m.email}</span></p>
+                    {m.subject ? <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">Subject: {m.subject}</p> : null}
+                    <p className="mt-2 text-sm text-[color:var(--muted-foreground)] line-clamp-3">{m.body}</p>
+                    {!m.read ? (
+                      <div className="mt-3">
+                        <button
+                          onClick={(ev) => {
+                            ev.stopPropagation()
+                            void markMessageRead(m.id)
+                          }}
+                          className="rounded-md bg-zinc-800 px-3 py-1 text-sm hover:opacity-90"
+                        >
+                          Mark as read
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="text-right text-sm text-[color:var(--muted-foreground)]">
+                    <div>{new Date(m.createdAt).toLocaleString()}</div>
+                    <div className={m.read ? "mt-2 text-emerald-300 font-semibold" : "mt-2 text-amber-300 font-semibold"}>{m.read ? 'Read' : 'Unread'}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="mb-10 grid gap-6 lg:grid-cols-2">
         <div className="glass rounded-2xl border border-[color:var(--border)] p-5">

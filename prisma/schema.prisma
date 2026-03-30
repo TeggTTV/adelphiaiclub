@@ -42,6 +42,7 @@ model User {
   approvedProjects     Project[]            @relation("ProjectApprover")
   files                FileItem[]           @relation("FileUploader")
   dashboardHashRecords DashboardHashRecord[] @relation("DashboardHashCreator")
+  handledMessages      Message[]
 }
 
 model Session {
@@ -189,4 +190,21 @@ model DashboardHashRecord {
 
   @@index([createdAt])
   @@index([isCurrent])
+}
+
+model Message {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String
+  subject     String?
+  body        String
+  ipAddress   String?
+  read        Boolean  @default(false)
+  handledById String?  @db.ObjectId
+  handledAt   DateTime?
+  createdAt   DateTime @default(now())
+  handledBy   User?    @relation(fields: [handledById], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([read])
 }
