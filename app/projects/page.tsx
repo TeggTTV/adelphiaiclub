@@ -17,6 +17,7 @@ import {
   UserRound,
 } from "lucide-react"
 import PreviewModal from "@/components/PreviewModal"
+import { SkeletonGrid } from "@/components/ui/Skeleton"
 
 type SortMode = "featured" | "recent" | "title"
 
@@ -362,7 +363,11 @@ export default function ProjectsPage() {
             </div>
           </div>
 
-          {loading && <p className="text-[color:var(--muted-foreground)]">Loading projects...</p>}
+          {loading && (
+            <div className="mt-6">
+              <SkeletonGrid count={6} />
+            </div>
+          )}
           {error && <p className="mb-4 text-red-400">{error}</p>}
 
           {filteredProjects.length === 0 && !loading ? (

@@ -16,6 +16,7 @@ import {
   Folder,
   Search,
 } from "lucide-react"
+import { SkeletonGrid, SkeletonList, SkeletonStat } from "@/components/ui/Skeleton"
 
 type SortMode = "newest" | "oldest" | "name" | "largest"
 
@@ -306,7 +307,20 @@ export default function FilesPage() {
             </div>
           </div>
 
-          {loading && <p className="text-[color:var(--muted-foreground)]">Loading files...</p>}
+          {loading && (
+            <>
+              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <SkeletonStat />
+                <SkeletonStat />
+                <SkeletonStat />
+                <SkeletonStat />
+              </div>
+
+              <div className="mt-8">
+                <SkeletonList groups={3} itemsPerGroup={4} />
+              </div>
+            </>
+          )}
           {error && <p className="mb-4 text-red-400">{error}</p>}
 
           {groupedFiles.length === 0 && !loading ? (

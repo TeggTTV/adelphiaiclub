@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { SkeletonGrid, SkeletonList, SkeletonStat } from "@/components/ui/Skeleton"
 
 type DashboardData = {
   userCount: number
@@ -1153,7 +1154,22 @@ export default function DashboardPage() {
   }
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center">Loading dashboard...</div>
+    return (
+      <div className="mx-auto w-full max-w-7xl px-4 py-24">
+        <div className="mb-8 grid gap-4 md:grid-cols-3 xl:grid-cols-8">
+          <SkeletonStat />
+          <SkeletonStat />
+          <SkeletonStat />
+          <SkeletonStat />
+          <SkeletonStat />
+          <SkeletonStat />
+        </div>
+
+        <div className="mt-8">
+          <SkeletonList groups={2} itemsPerGroup={3} />
+        </div>
+      </div>
+    )
   }
 
   return (

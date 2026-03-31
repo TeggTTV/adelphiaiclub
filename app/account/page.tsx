@@ -138,7 +138,19 @@ export default function AccountPage() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center text-[color:var(--muted-foreground)]">
-        Loading account...
+        <div className="w-full max-w-3xl px-4">
+          <div className="mx-auto">
+            <div className="rounded-2xl">
+              {/* lightweight skeleton while loading account */}
+              <div className="animate-pulse">
+                <div className="h-8 w-64 rounded bg-[color:var(--muted-foreground)]/12 mb-4" />
+                <div className="h-6 w-full rounded bg-[color:var(--muted-foreground)]/8 mb-3" />
+                <div className="h-6 w-full rounded bg-[color:var(--muted-foreground)]/8 mb-3" />
+                <div className="h-10 w-40 rounded bg-[color:var(--muted-foreground)]/10 mt-6" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
