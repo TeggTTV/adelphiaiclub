@@ -106,6 +106,17 @@ export default function Home() {
     }
   }, [])
 
+  const upcomingEvents = React.useMemo(() => {
+    const now = Date.now()
+    return events
+      .filter((e) => {
+        const t = new Date(e.date).getTime()
+        return !Number.isNaN(t) && t >= now
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 3)
+  }, [events])
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       {/* Hero Section */}
@@ -257,7 +268,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event, i) => (
+            {upcomingEvents.map((event, i) => (
               <motion.div
                 key={event.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -286,7 +297,7 @@ export default function Home() {
                 </div>
               </motion.div>
             ))}
-            {events.length === 0 && (
+            {upcomingEvents.length === 0 && (
               <div className="md:col-span-2 lg:col-span-3 glass rounded-2xl p-8 text-center text-[color:var(--muted-foreground)]">
                 Upcoming events will appear here once they are added in the dashboard.
               </div>
