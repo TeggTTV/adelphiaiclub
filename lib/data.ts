@@ -1,4 +1,17 @@
-// Placeholder data for AI Society
+// ─────────────────────────────────────────────────────────────────────────────
+// E-Board Members
+//
+// HOW TO ADD A REAL PROFILE PHOTO:
+//   1. Drop the photo in /public/images/eboard/ — recommended: JPG or WebP,
+//      at least 800×1000px, portrait orientation (4:5 ratio works great).
+//      Name it to match the current imageUrl path, e.g. "santiago-rodriguez.jpg"
+//   2. Update imageUrl to the new filename:
+//        imageUrl: '/images/eboard/santiago-rodriguez.jpg'
+//   3. Set photoReady: true — this hides the "Photo Coming Soon" badge.
+//
+// Until a real photo is added, the SVG placeholder in /public/images/eboard/
+// will be shown automatically (initials + gradient, unique color per person).
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const eboardMembers = [
 	{

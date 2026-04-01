@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { JetBrains_Mono } from 'next/font/google';
+import localFont from 'next/font/local';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -20,6 +21,13 @@ import './globals.css';
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrains-mono',
+});
+
+// Cabinet Grotesk — Fontshare EULA: free for personal & commercial use
+const cabinetGrotesk = localFont({
+  src: '../public/fonts/CabinetGrotesk_Complete/Fonts/TTF/CabinetGrotesk-Variable.ttf',
+  variable: '--font-cabinet-grotesk',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -119,8 +127,8 @@ const websiteSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${jetbrainsMono.variable}`}>
-      <body className="min-h-screen flex flex-col bg-[color:var(--background)] text-[color:var(--foreground)] font-mono antialiased">
+    <html lang="en" suppressHydrationWarning className={`${jetbrainsMono.variable} ${cabinetGrotesk.variable}`}>
+      <body className="min-h-screen flex flex-col bg-[color:var(--background)] text-[color:var(--foreground)] font-sans antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

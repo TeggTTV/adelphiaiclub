@@ -1,12 +1,25 @@
 <svg width="800" height="1000" viewBox="0 0 800 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="1000">
-      <stop offset="0" stop-color="#2563EB" />
-      <stop offset="1" stop-color="#8B5CF6" />
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#881337"/>
+      <stop offset="100%" stop-color="#e11d48"/>
     </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="38%" r="45%">
+      <stop offset="0%" stop-color="#fb7185" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <pattern id="dots" patternUnits="userSpaceOnUse" width="40" height="40">
+      <circle cx="20" cy="20" r="1.5" fill="rgba(255,255,255,0.06)"/>
+    </pattern>
   </defs>
-  <rect width="800" height="1000" rx="48" fill="url(#bg)"/>
-  <circle cx="400" cy="380" r="150" fill="rgba(255,255,255,0.18)"/>
-  <text x="400" y="420" text-anchor="middle" fill="#ffffff" font-size="128" font-family="JetBrains Mono, monospace" font-weight="700">RF</text>
-  <text x="400" y="860" text-anchor="middle" fill="rgba(255,255,255,0.92)" font-size="44" font-family="JetBrains Mono, monospace">Rian Fernando</text>
+  <rect width="800" height="1000" fill="url(#bg)"/>
+  <rect width="800" height="1000" fill="url(#dots)"/>
+  <rect width="800" height="1000" fill="url(#glow)"/>
+  <circle cx="400" cy="380" r="180" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+  <text x="400" y="440" text-anchor="middle" fill="rgba(255,255,255,0.95)" font-size="140" font-family="system-ui, sans-serif" font-weight="700" letter-spacing="-4">RF</text>
+  <rect x="240" y="648" width="320" height="1.5" fill="rgba(255,255,255,0.15)" rx="1"/>
+  <text x="400" y="710" text-anchor="middle" fill="rgba(255,255,255,0.95)" font-size="48" font-family="system-ui, sans-serif" font-weight="600">Rian Fernando</text>
+  <text x="400" y="770" text-anchor="middle" fill="rgba(251,113,133,0.9)" font-size="32" font-family="system-ui, sans-serif" font-weight="500" letter-spacing="2">SECRETARY</text>
+  <rect x="250" y="840" width="300" height="56" rx="28" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  <text x="400" y="875" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="24" font-family="system-ui, sans-serif" font-weight="500" letter-spacing="1">Photo Coming Soon</text>
 </svg>

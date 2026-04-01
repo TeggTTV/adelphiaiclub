@@ -13,7 +13,7 @@
   --color-ring: #8b5cf6;
 
   --font-mono: var(--font-jetbrains-mono);
-  --font-sans: var(--font-jetbrains-mono);
+  --font-sans: var(--font-cabinet-grotesk);
 
   --radius-lg: 1rem;
   --radius-md: 0.75rem;
@@ -51,7 +51,12 @@
     @apply border-[color:var(--border)];
   }
   body {
-    @apply bg-[color:var(--background)] text-[color:var(--foreground)] font-mono antialiased;
+    @apply bg-[color:var(--background)] text-[color:var(--foreground)] font-sans antialiased;
+  }
+
+  /* Keep mono font for code, kbd, pre elements and explicit .font-mono usage */
+  code, kbd, pre, samp {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
   }
 }
 
