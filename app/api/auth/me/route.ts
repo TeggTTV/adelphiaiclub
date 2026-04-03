@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getCurrentUser, hasDashboardAccess, isDashboardAdminUser } from "@/lib/auth"
+import { getCurrentUser, isDashboardAdminUser } from "@/lib/auth"
 
 export async function GET() {
   const user = await getCurrentUser()
@@ -7,9 +7,11 @@ export async function GET() {
     return NextResponse.json({ user: null })
   }
 
+  const isDashboardAdmin = isDashboardAdminUser(user)
+
   return NextResponse.json({
     user,
-    isDashboardAdmin: isDashboardAdminUser(user),
-    dashboardAccess: await hasDashboardAccess(),
+    isDashboardAdmin,
+    dashboardAccess: isDashboardAdmin,
   })
 }

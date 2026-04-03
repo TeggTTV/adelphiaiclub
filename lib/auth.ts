@@ -1,13 +1,11 @@
 import { UserRole } from "@prisma/client"
 import { cookies } from "next/headers"
 import prisma from "@/lib/prisma"
-import { randomToken, sha256, signValue, verifySignedValue } from "@/lib/security"
+import { randomToken, sha256 } from "@/lib/security"
 
 export const SESSION_COOKIE_NAME = "club_session"
-export const DASHBOARD_COOKIE_NAME = "club_dashboard_access"
 
 const SESSION_TTL_HOURS = Number(process.env.SESSION_TTL_HOURS || 24 * 14)
-const DASHBOARD_TTL_MINUTES = Number(process.env.DASHBOARD_ACCESS_MINUTES || 45)
 
 type UserSessionRecord = {
   id: string
@@ -33,7 +31,11 @@ export function isConfiguredAdminEmail(email: string | null | undefined) {
 
 export function isDashboardAdminUser(user: AuthUser | null | undefined) {
   if (!user) return false
-  return user.role === "ADMIN" && isConfiguredAdminEmail(user.email)
+  // Grant dashboard access based only on configured admin emails.
+  // Previously this required the user role to be ADMIN as well —
+  // remove that requirement so any account with a configured
+  // admin email can access the dashboard.
+  return isConfiguredAdminEmail(user.email)
 }
 
 function isSecureCookie() {
@@ -149,46 +151,9 @@ export async function isAdminUser() {
   return isDashboardAdminUser(user)
 }
 
-export function createDashboardAccessValue(userId: string) {
-  const expiresAt = new Date(Date.now() + DASHBOARD_TTL_MINUTES * 60 * 1000)
-  const payload = `${userId}:${expiresAt.getTime()}`
-  return {
-    value: signValue(payload),
-    expiresAt,
-  }
-}
-
-export function verifyDashboardAccessValue(value: string, userId: string) {
-  const payload = verifySignedValue(value)
-  if (!payload) return false
-
-  const [cookieUserId, expiryRaw] = payload.split(":")
-  if (!cookieUserId || !expiryRaw) return false
-  if (cookieUserId !== userId) return false
-
-  const expiry = Number(expiryRaw)
-  if (!Number.isFinite(expiry)) return false
-
-  return Date.now() < expiry
-}
-
 export async function hasDashboardAccess() {
   const user = await getCurrentUser()
-  if (!user) {
-    return false
-  }
-
-  if (!isDashboardAdminUser(user)) {
-    return false
-  }
-
-  const cookieStore = await cookies()
-  const accessCookie = cookieStore.get(DASHBOARD_COOKIE_NAME)?.value
-  if (!accessCookie) {
-    return false
-  }
-
-  return verifyDashboardAccessValue(accessCookie, user.id)
+  return isDashboardAdminUser(user)
 }
 
 export function sanitizeUser<T extends { passwordHash?: string; deletedAt?: Date | null }>(user: T) {

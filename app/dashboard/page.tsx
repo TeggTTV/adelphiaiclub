@@ -115,45 +115,11 @@ type ProjectEditForm = {
   liveUrl: string
 }
 
-type PasskeyStatus = {
-  configured: boolean
-  source: "database" | "env_hash" | "env_plain" | "none"
-  updatedAt: string | null
-  dashboardUnlocked: boolean
-  currentHash: {
-    id: string
-    action: "GENERATED" | "ACTIVATED"
-    createdById: string | null
-    createdByName: string
-    createdByEmail: string
-    createdAt: string
-    inUse: boolean
-  } | null
-  hashLog: Array<{
-    id: string
-    action: "GENERATED" | "ACTIVATED"
-    inUse: boolean
-    createdById: string | null
-    createdByName: string
-    createdByEmail: string
-    createdAt: string
-  }>
-}
-
 const emptyDashboard: DashboardData = {
   userCount: 0,
   pendingPosts: [],
   pendingProjects: [],
   recentFiles: [],
-}
-
-const emptyPasskeyStatus: PasskeyStatus = {
-  configured: false,
-  source: "none",
-  updatedAt: null,
-  dashboardUnlocked: false,
-  currentHash: null,
-  hashLog: [],
 }
 
 export default function DashboardPage() {
@@ -198,20 +164,7 @@ export default function DashboardPage() {
     githubUrl: "",
     liveUrl: "",
   })
-  const [passkeyStatus, setPasskeyStatus] = React.useState<PasskeyStatus>(emptyPasskeyStatus)
-  const [eboard, setEboard] = React.useState<Array<{
-    id: string
-    name: string
-    role: string
-    bio?: string | null
-    imageUrl?: string | null
-    instagram?: string | null
-    linkedin?: string | null
-    github?: string | null
-    order: number
-  }>>([])
-  const [editingEboardId, setEditingEboardId] = React.useState<string | null>(null)
-  const [newEboardForm, setNewEboardForm] = React.useState({ name: "", role: "", bio: "", imageUrl: "", instagram: "", linkedin: "", github: "", order: 0 })
+
 
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState("")
@@ -224,19 +177,10 @@ export default function DashboardPage() {
   const [newFileTags, setNewFileTags] = React.useState("")
   const [newFileUpload, setNewFileUpload] = React.useState<File | null>(null)
 
-  const [newPasskey, setNewPasskey] = React.useState("")
-  const [confirmPasskey, setConfirmPasskey] = React.useState("")
-  const [savingPasskey, setSavingPasskey] = React.useState(false)
-  const [hashInput, setHashInput] = React.useState("")
-  const [generatedHash, setGeneratedHash] = React.useState("")
-  const [generatingHash, setGeneratingHash] = React.useState(false)
-
   const [updatingUsers, setUpdatingUsers] = React.useState<Record<string, boolean>>({})
   const [updatingApproved, setUpdatingApproved] = React.useState<Record<string, boolean>>({})
-  const [checkingUnlock, setCheckingUnlock] = React.useState(true)
   const [dashboardUnlocked, setDashboardUnlocked] = React.useState(false)
-  const [unlockPasskey, setUnlockPasskey] = React.useState("")
-  const [unlocking, setUnlocking] = React.useState(false)
+  const [checkingUnlock, setCheckingUnlock] = React.useState(true)
   const [unlockError, setUnlockError] = React.useState("")
 
   const checkUnlockAccess = React.useCallback(async () => {
@@ -251,11 +195,11 @@ export default function DashboardPage() {
       const payload = await response.json().catch(() => ({}))
       if (!response.ok) {
         setDashboardUnlocked(false)
-        setUnlockError(payload.error || "Unable to verify dashboard access")
+        setUnlockError(payload.error || "Access denied")
         return
       }
 
-      setDashboardUnlocked(Boolean(payload.dashboardAccess))
+      setDashboardUnlocked(Boolean(payload.isDashboardAdmin))
     } catch {
       setDashboardUnlocked(false)
       setUnlockError("Unable to verify dashboard access")
@@ -269,11 +213,10 @@ export default function DashboardPage() {
     setError("")
 
     try {
-      const [overviewResponse, filesResponse, usersResponse, passkeyResponse, blogResponse, projectResponse] = await Promise.all([
+      const [overviewResponse, filesResponse, usersResponse, blogResponse, projectResponse] = await Promise.all([
         fetch("/api/dashboard/overview", { credentials: "include" }),
         fetch("/api/files?scope=all", { credentials: "include" }),
         fetch("/api/dashboard/users", { credentials: "include" }),
-        fetch("/api/dashboard/security/passkey", { credentials: "include" }),
         fetch("/api/blog/posts?scope=all", { credentials: "include" }),
         fetch("/api/projects?scope=all", { credentials: "include" }),
       ])
@@ -281,16 +224,14 @@ export default function DashboardPage() {
       const overviewData = await overviewResponse.json().catch(() => ({}))
       const filesData = await filesResponse.json().catch(() => ({}))
       const usersData = await usersResponse.json().catch(() => ({}))
-      const passkeyData = await passkeyResponse.json().catch(() => ({}))
       const blogData = await blogResponse.json().catch(() => ({}))
       const projectData = await projectResponse.json().catch(() => ({}))
       const messagesData = await (await fetch("/api/dashboard/messages", { credentials: "include" })).json().catch(() => ({}))
-      const eboardData = await (await fetch("/api/dashboard/eboard", { credentials: "include" })).json().catch(() => ({}))
 
       if (!overviewResponse.ok) {
-        if (overviewResponse.status === 401) {
+        if (overviewResponse.status === 401 || overviewResponse.status === 403) {
           setDashboardUnlocked(false)
-          setUnlockError(overviewData.error || "Dashboard unlock required")
+          setUnlockError(overviewData.error || "Access denied")
           return
         }
 
@@ -306,24 +247,12 @@ export default function DashboardPage() {
         setError(usersData.error || "Unable to load users")
       }
 
-      if (!passkeyResponse.ok) {
-        setError(passkeyData.error || "Unable to load passkey settings")
-      }
-
       if (!blogResponse.ok) {
         setError(blogData.error || "Unable to load blog submissions")
       }
 
       if (!projectResponse.ok) {
         setError(projectData.error || "Unable to load projects")
-      }
-
-      if (!Array.isArray(messagesData.messages)) {
-        // ignore if messages not available
-      }
-
-      if (!Array.isArray(eboardData.members)) {
-        // ignore
       }
 
       const allBlogPosts = Array.isArray(blogData.posts) ? (blogData.posts as BlogPostRecord[]) : []
@@ -346,16 +275,6 @@ export default function DashboardPage() {
       setRejectedPosts(rejectedBlogPosts)
       setRejectedProjects(rejectedProjectRows)
       setMessages(messagesData.messages || [])
-      setEboard(eboardData.members || [])
-      setPasskeyStatus({
-        configured: Boolean(passkeyData.configured),
-        source: passkeyData.source || "none",
-        updatedAt: passkeyData.updatedAt || null,
-        dashboardUnlocked: Boolean(passkeyData.dashboardUnlocked),
-        currentHash: passkeyData.currentHash || null,
-        hashLog: passkeyData.hashLog || [],
-      })
-      setEboard(messagesData.eboard || [])
     } catch {
       setError("Unable to load dashboard")
     } finally {
@@ -374,36 +293,6 @@ export default function DashboardPage() {
 
     void load()
   }, [dashboardUnlocked, load])
-
-  const unlockDashboard = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setUnlockError("")
-    setUnlocking(true)
-
-    try {
-      const response = await fetch("/api/auth/admin/unlock", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ passkey: unlockPasskey }),
-      })
-
-      const payload = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        setUnlockError(payload.error || "Unable to unlock dashboard")
-        return
-      }
-
-      setDashboardUnlocked(true)
-      setUnlockPasskey("")
-    } catch {
-      setUnlockError("Unable to unlock dashboard")
-    } finally {
-      setUnlocking(false)
-    }
-  }
 
   const reviewPost = async (id: string, action: "approve" | "reject") => {
     setMessage("")
@@ -517,98 +406,9 @@ export default function DashboardPage() {
     await load()
   }
 
-  const savePasskey = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setMessage("")
-    setError("")
 
-    if (!newPasskey || newPasskey.length < 10) {
-      setError("Passkey must be at least 10 characters")
-      return
-    }
 
-    if (newPasskey !== confirmPasskey) {
-      setError("Passkey confirmation does not match")
-      return
-    }
 
-    setSavingPasskey(true)
-
-    try {
-      const response = await fetch("/api/dashboard/security/passkey", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ newPasskey }),
-      })
-
-      const payload = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        setError(payload.error || "Unable to update dashboard passkey")
-        return
-      }
-
-      setNewPasskey("")
-      setConfirmPasskey("")
-      setMessage("Dashboard passkey hash updated")
-      await load()
-    } catch {
-      setError("Unable to update dashboard passkey")
-    } finally {
-      setSavingPasskey(false)
-    }
-  }
-
-  const createEboardMember = async (ev?: React.FormEvent) => {
-    if (ev) ev.preventDefault()
-    setMessage("")
-    setError("")
-
-    try {
-      const response = await fetch('/api/dashboard/eboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(newEboardForm),
-      })
-      const payload = await response.json().catch(() => ({}))
-      if (!response.ok) { setError(payload.error || 'Unable to create member'); return }
-      setNewEboardForm({ name: '', role: '', bio: '', imageUrl: '', instagram: '', linkedin: '', github: '', order: 0 })
-      await load()
-    } catch {
-      setError('Unable to create member')
-    }
-  }
-
-  const updateEboardMember = async (id: string, data: any) => {
-    setMessage("")
-    setError("")
-    try {
-      const response = await fetch(`/api/dashboard/eboard/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(data) })
-      const payload = await response.json().catch(() => ({}))
-      if (!response.ok) { setError(payload.error || 'Unable to update member'); return }
-      setEditingEboardId(null)
-      await load()
-    } catch {
-      setError('Unable to update member')
-    }
-  }
-
-  const deleteEboardMember = async (id: string) => {
-    if (!confirm('Delete this member?')) return
-    setMessage("")
-    setError("")
-    try {
-      const response = await fetch(`/api/dashboard/eboard/${id}`, { method: 'DELETE', credentials: 'include' })
-      const payload = await response.json().catch(() => ({}))
-      if (!response.ok) { setError(payload.error || 'Unable to delete member'); return }
-      await load()
-    } catch {
-      setError('Unable to delete member')
-    }
-  }
 
   const rejectApprovedPost = async (id: string) => {
     const confirmed = window.confirm("Move this approved post to rejected?")
@@ -990,73 +790,7 @@ export default function DashboardPage() {
     }
   }
 
-  const clearDatabasePasskey = async () => {
-    const confirmed = window.confirm("Clear database-managed passkey hash and fall back to .env?")
-    if (!confirmed) return
 
-    const response = await fetch("/api/dashboard/security/passkey", {
-      method: "DELETE",
-      credentials: "include",
-    })
-
-    const payload = await response.json().catch(() => ({}))
-    if (!response.ok) {
-      setError(payload.error || "Unable to clear database passkey")
-      return
-    }
-
-    setMessage("Database passkey hash cleared")
-    await load()
-  }
-
-  const generateHash = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setMessage("")
-    setError("")
-
-    if (!hashInput || hashInput.length < 8) {
-      setError("Password must be at least 8 characters to hash")
-      return
-    }
-
-    setGeneratingHash(true)
-
-    try {
-      const response = await fetch("/api/dashboard/security/hash", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ password: hashInput }),
-      })
-
-      const payload = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        setError(payload.error || "Unable to generate hash")
-        return
-      }
-
-      setGeneratedHash(payload.hash || "")
-      setMessage("Hash generated and logged")
-      await load()
-    } catch {
-      setError("Unable to generate hash")
-    } finally {
-      setGeneratingHash(false)
-    }
-  }
-
-  const copyGeneratedHash = async () => {
-    if (!generatedHash) return
-
-    try {
-      await navigator.clipboard.writeText(generatedHash)
-      setMessage("Hash copied to clipboard")
-    } catch {
-      setError("Unable to copy hash")
-    }
-  }
 
   const updateUserRole = async (targetUserId: string, role: "MEMBER" | "ADMIN") => {
     setMessage("")
@@ -1125,29 +859,10 @@ export default function DashboardPage() {
     return (
       <div className="flex min-h-screen items-center justify-center px-4 py-24">
         <div className="glass w-full max-w-md rounded-2xl border border-[color:var(--border)] p-6">
-          <h1 className="text-2xl font-black tracking-tight">Unlock Creator Dashboard</h1>
+          <h1 className="text-2xl font-black tracking-tight">Access Denied</h1>
           <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
-            Enter the dashboard passkey hash to access admin tools.
+            {unlockError || "You do not have permission to access the admin dashboard."}
           </p>
-
-          <form onSubmit={unlockDashboard} className="mt-5 space-y-3">
-            <input
-              type="password"
-              value={unlockPasskey}
-              onChange={(event) => setUnlockPasskey(event.target.value)}
-              placeholder="Dashboard passkey"
-              className="h-11 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
-              required
-            />
-            {unlockError ? <p className="text-sm text-red-400">{unlockError}</p> : null}
-            <button
-              type="submit"
-              disabled={unlocking}
-              className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[color:var(--primary)] px-4 text-sm font-bold text-[color:var(--primary-foreground)] disabled:opacity-60"
-            >
-              {unlocking ? "Unlocking..." : "Unlock Dashboard"}
-            </button>
-          </form>
         </div>
       </div>
     )
@@ -1262,180 +977,9 @@ export default function DashboardPage() {
         )}
       </section>
 
-      <section className="mb-8">
-        <h2 className="mb-3 text-xl font-bold">Executive Board</h2>
-        <div className="glass rounded-2xl border border-[color:var(--border)] p-6">
-          <form onSubmit={createEboardMember} className="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <input value={newEboardForm.name} onChange={(e) => setNewEboardForm((s) => ({ ...s, name: e.target.value }))} placeholder="Name" className="input" />
-            <input value={newEboardForm.role} onChange={(e) => setNewEboardForm((s) => ({ ...s, role: e.target.value }))} placeholder="Role" className="input" />
-            <input value={newEboardForm.instagram} onChange={(e) => setNewEboardForm((s) => ({ ...s, instagram: e.target.value }))} placeholder="Instagram URL or handle" className="input" />
-            <input value={newEboardForm.imageUrl} onChange={(e) => setNewEboardForm((s) => ({ ...s, imageUrl: e.target.value }))} placeholder="Image URL" className="input col-span-2" />
-            <input value={newEboardForm.bio} onChange={(e) => setNewEboardForm((s) => ({ ...s, bio: e.target.value }))} placeholder="Short description" className="input col-span-3" />
-            <div />
-            <button className="btn-primary">Add Member</button>
-          </form>
 
-          <div className="grid gap-3">
-            {eboard.map((m) => (
-              <div key={m.id} className="flex items-start justify-between gap-4 border-b pb-3">
-                <div className="min-w-0 flex gap-3 items-start">
-                  {m.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={m.imageUrl} alt={m.name} className="h-12 w-12 rounded-md object-cover" />
-                  ) : null}
-                  <div>
-                    <div className="font-bold">{m.name} <span className="text-xs text-[color:var(--muted-foreground)]">{m.role}</span></div>
-                    <div className="text-sm text-[color:var(--muted-foreground)] line-clamp-2">{m.bio}</div>
-                    {m.instagram ? <div className="text-xs text-[color:var(--primary)]">{m.instagram}</div> : null}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {editingEboardId === m.id ? (
-                    <>
-                      <button onClick={() => updateEboardMember(m.id, { name: m.name })} className="rounded bg-zinc-800 px-3 py-1 text-sm">Save</button>
-                      <button onClick={() => setEditingEboardId(null)} className="rounded border px-3 py-1 text-sm">Cancel</button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => setEditingEboardId(m.id)} className="rounded border px-3 py-1 text-sm">Edit</button>
-                      <button onClick={() => deleteEboardMember(m.id)} className="rounded bg-red-700 px-3 py-1 text-sm">Delete</button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <section className="mb-10 grid gap-6 lg:grid-cols-2">
-        <div className="glass rounded-2xl border border-[color:var(--border)] p-5">
-          <h2 className="mb-2 text-xl font-bold">Admin Passkey Hash Management</h2>
-          <p className="mb-1 text-sm text-[color:var(--muted-foreground)]">
-            Current source: <span className="font-semibold">{passkeyStatus.source}</span>
-            {passkeyStatus.updatedAt ? ` (updated ${new Date(passkeyStatus.updatedAt).toLocaleString()})` : ""}
-          </p>
-          <p className="mb-1 text-sm text-[color:var(--muted-foreground)]">
-            Dashboard session: {" "}
-            <span className={passkeyStatus.dashboardUnlocked ? "font-semibold text-emerald-300" : "font-semibold text-rose-300"}>
-              {passkeyStatus.dashboardUnlocked ? "Unlocked" : "Locked"}
-            </span>
-          </p>
-          <p className="mb-4 text-sm text-[color:var(--muted-foreground)]">
-            Current hash: {" "}
-            {passkeyStatus.currentHash ? (
-              <>
-                <span className="font-semibold text-[color:var(--foreground)]">{passkeyStatus.currentHash.inUse ? "In use" : "Not in use"}</span>
-                {` (set by ${passkeyStatus.currentHash.createdByName} on ${new Date(passkeyStatus.currentHash.createdAt).toLocaleString()})`}
-              </>
-            ) : (
-              <span className="font-semibold">None</span>
-            )}
-          </p>
-
-          <form onSubmit={savePasskey} className="space-y-3">
-            <input
-              type="password"
-              value={newPasskey}
-              onChange={(event) => setNewPasskey(event.target.value)}
-              placeholder="New dashboard passkey"
-              minLength={10}
-              required
-              className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
-            />
-            <input
-              type="password"
-              value={confirmPasskey}
-              onChange={(event) => setConfirmPasskey(event.target.value)}
-              placeholder="Confirm new passkey"
-              minLength={10}
-              required
-              className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
-            />
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="submit"
-                disabled={savingPasskey}
-                className="inline-flex h-10 items-center justify-center rounded-xl bg-[color:var(--primary)] px-4 text-sm font-bold text-[color:var(--primary-foreground)] disabled:opacity-60"
-              >
-                {savingPasskey ? "Saving..." : "Save Hashed Passkey"}
-              </button>
-              <button
-                type="button"
-                onClick={clearDatabasePasskey}
-                className="inline-flex h-10 items-center justify-center rounded-xl border border-[color:var(--border)] px-4 text-sm font-semibold"
-              >
-                Clear DB Override
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-5 border-t border-[color:var(--border)] pt-4">
-            <h3 className="mb-2 text-sm font-bold uppercase tracking-[0.08em] text-[color:var(--muted-foreground)]">
-              Password Hash Generator
-            </h3>
-            <form onSubmit={generateHash} className="space-y-3">
-              <input
-                type="password"
-                value={hashInput}
-                onChange={(event) => setHashInput(event.target.value)}
-                placeholder="Password to hash"
-                minLength={8}
-                required
-                className="h-10 w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 text-sm"
-              />
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="submit"
-                  disabled={generatingHash}
-                  className="inline-flex h-10 items-center justify-center rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-4 text-sm font-semibold disabled:opacity-60"
-                >
-                  {generatingHash ? "Generating..." : "Generate Hash"}
-                </button>
-                <button
-                  type="button"
-                  onClick={copyGeneratedHash}
-                  disabled={!generatedHash}
-                  className="inline-flex h-10 items-center justify-center rounded-xl border border-[color:var(--border)] px-4 text-sm font-semibold disabled:opacity-60"
-                >
-                  Copy Hash
-                </button>
-              </div>
-              <textarea
-                value={generatedHash}
-                readOnly
-                placeholder="Generated hash will appear here"
-                rows={3}
-                className="w-full rounded-xl border border-[color:var(--border)] bg-[color:var(--background)] px-3 py-2 text-xs"
-              />
-            </form>
-
-            <div className="mt-4">
-              <h4 className="mb-2 text-xs font-bold uppercase tracking-[0.1em] text-[color:var(--muted-foreground)]">
-                Hash Audit Log
-              </h4>
-              <div className="max-h-44 overflow-auto rounded-xl border border-[color:var(--border)] bg-[color:var(--background)]/60">
-                {passkeyStatus.hashLog.length === 0 ? (
-                  <p className="px-3 py-3 text-xs text-[color:var(--muted-foreground)]">No hash records yet.</p>
-                ) : (
-                  <ul className="divide-y divide-[color:var(--border)]">
-                    {passkeyStatus.hashLog.map((record) => (
-                      <li key={record.id} className="px-3 py-2 text-xs">
-                        <p className="font-semibold">
-                          {record.action} {record.inUse ? "(current)" : "(archived)"}
-                        </p>
-                        <p className="text-[color:var(--muted-foreground)]">
-                          {record.createdByName} ({record.createdByEmail}) - {new Date(record.createdAt).toLocaleString()}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="glass rounded-2xl border border-[color:var(--border)] p-5">
           <h2 className="mb-4 text-xl font-bold">Add File From Computer</h2>
           <form onSubmit={createFile} className="space-y-3">
