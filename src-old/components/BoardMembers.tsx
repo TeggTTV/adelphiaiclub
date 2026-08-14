@@ -56,13 +56,13 @@ const AvatarSVG = ({
 };
 
 const boardMembers = [
-    {
-        name: 'Santiago Rodriguez',
-        role: 'President',
-        description:
-            'Aritifical Intelligence major passionate about exploring emerging technologies to spark new ideas, unlock creativity, and drive meaningful progress.',
-        instagram: 'https://santiagorodriguez.dev', // Updated to personal website
-    },
+	{
+		name: 'Santiago Rodriguez',
+		role: 'President',
+		description:
+			'Aritifical Intelligence major passionate about exploring emerging technologies to spark new ideas, unlock creativity, and drive meaningful progress.',
+		instagram: 'https://santiagorodriguez.dev', // Updated to personal website
+	},
 	{
 		name: 'Doryan Bendezu',
 		role: 'Vice President',
@@ -70,20 +70,20 @@ const boardMembers = [
 			'Nursing major bringing healthcare perspective to AI applications. Focused on bridging the gap between medical care and artificial intelligence.',
 		instagram: 'https://instagram.com/doctordbd', // Replace with actual Instagram handle
 	},
-    {
-        name: 'Joseph Jazwinski',
-        role: 'Senior Software Engineer',
-        description:
-            'Computer Science major with 7+ years of coding experience, specializing in TypeScript web development and backend systems.',
-        instagram: 'https://josephjazwinski.com', // Updated to personal website
-    },
 	{
-		name: 'Michael Riccio',
-		role: 'Treasurer',
+		name: 'Joseph Jazwinski',
+		role: 'Senior Software Engineer',
 		description:
-			'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
-		instagram: 'https://instagram.com/mikecankindacook', // Replace with actual Instagram handle
+			'Computer Science major with 7+ years of coding experience, specializing in TypeScript web development and backend systems.',
+		instagram: 'https://josephjazwinski.com', // Updated to personal website
 	},
+	// {
+	// 	name: 'Michael Riccio',
+	// 	role: 'Treasurer',
+	// 	description:
+	// 		'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
+	// 	instagram: 'https://instagram.com/mikecankindacook', // Replace with actual Instagram handle
+	// },
 	{
 		name: 'Rian Fernando',
 		role: 'Secretary',
@@ -91,13 +91,13 @@ const boardMembers = [
 			'Computer Science major dedicated to supporting the club and advancing AI initiatives.',
 		instagram: '', // Add website or social if available
 	},
-	{
-		name: 'Cindy',
-		role: 'Social Media/Creative Director',
-		description:
-			'Leads our creative and social media efforts, bringing fresh ideas and vibrant energy to the club.',
-		instagram: '', // Add website or social if available
-	},
+	// {
+	// 	name: 'Cindy',
+	// 	role: 'Social Media/Creative Director',
+	// 	description:
+	// 		'Leads our creative and social media efforts, bringing fresh ideas and vibrant energy to the club.',
+	// 	instagram: '', // Add website or social if available
+	// },
 ];
 
 const BoardMembers = () => {
@@ -115,9 +115,9 @@ const BoardMembers = () => {
 		let frame: number;
 		let lastTs: number | null = null;
 		let scrollSpeed = 0.25; // px per ms
-		let running = true;	
+		let running = true;
 		function step(ts: number) {
-			if (!running) return;
+			if (!running || !carousel) return;
 			if (lastTs === null) lastTs = ts;
 			const dt = ts - lastTs;
 			lastTs = ts;
@@ -126,8 +126,12 @@ const BoardMembers = () => {
 			if (carousel.scrollLeft <= 0) {
 				carousel.scrollLeft = 0;
 				setDirection(1);
-			} else if (carousel.scrollLeft + carousel.offsetWidth >= carousel.scrollWidth) {
-				carousel.scrollLeft = carousel.scrollWidth - carousel.offsetWidth;
+			} else if (
+				carousel.scrollLeft + carousel.offsetWidth >=
+				carousel.scrollWidth
+			) {
+				carousel.scrollLeft =
+					carousel.scrollWidth - carousel.offsetWidth;
 				setDirection(-1);
 			}
 			frame = requestAnimationFrame(step);
@@ -218,6 +222,6 @@ const BoardMembers = () => {
 			</div>
 		</section>
 	);
-}
+};
 
 export default BoardMembers;
