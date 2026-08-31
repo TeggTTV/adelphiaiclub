@@ -1,7 +1,6 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import Particles from './bits/Particles';
 import { useState, useEffect, useRef, useId } from 'react';
 
 const AvatarSVG = ({
@@ -77,13 +76,13 @@ const boardMembers = [
 			'Computer Science major with 7+ years of coding experience, specializing in TypeScript web development and backend systems.',
 		instagram: 'https://josephjazwinski.com', // Updated to personal website
 	},
-	// {
-	// 	name: 'Michael Riccio',
-	// 	role: 'Treasurer',
-	// 	description:
-	// 		'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
-	// 	instagram: 'https://instagram.com/mikecankindacook', // Replace with actual Instagram handle
-	// },
+	{
+		name: 'Amy',
+		role: 'Treasurer',
+		description:
+			'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
+		instagram: 'https://instagram.com/mikecankindacook', // Replace with actual Instagram handle
+	},
 	{
 		name: 'Rian Fernando',
 		role: 'Secretary',
@@ -91,13 +90,13 @@ const boardMembers = [
 			'Computer Science major dedicated to supporting the club and advancing AI initiatives.',
 		instagram: '', // Add website or social if available
 	},
-	// {
-	// 	name: 'Cindy',
-	// 	role: 'Social Media/Creative Director',
-	// 	description:
-	// 		'Leads our creative and social media efforts, bringing fresh ideas and vibrant energy to the club.',
-	// 	instagram: '', // Add website or social if available
-	// },
+	{
+		name: 'Julia Abbaticchio',
+		role: 'Social Media/Creative Director',
+		description:
+			'Leads our creative and social media efforts, bringing fresh ideas and vibrant energy to the club.',
+		instagram: '', // Add website or social if available
+	},
 ];
 
 const BoardMembers = () => {
