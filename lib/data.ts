@@ -83,8 +83,8 @@ export const eboardMembers = [
 		name: 'Amy Mathew',
 		role: 'Treasurer',
 		bio: 'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
-		imageUrl: '/images/eboard/michael-riccio.svg',
-		instagram: 'https://instagram.com/mikecankindacook',
+		imageUrl: '/images/eboard/amy-mathew.svg',
+		instagram: '',
 		handles: [
 			{
 				label: 'Instagram',
