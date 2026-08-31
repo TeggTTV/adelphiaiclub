@@ -80,7 +80,7 @@ export const eboardMembers = [
 	},
 	{
 		id: '4',
-		name: 'Amy',
+		name: 'Amy Mathew',
 		role: 'Treasurer',
 		bio: 'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
 		imageUrl: '/images/eboard/michael-riccio.svg',
