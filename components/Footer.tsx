@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Github, Instagram, Mail } from "lucide-react"
+import { Instagram, Mail } from "lucide-react"
 
 export function Footer() {
   return (
@@ -39,10 +39,6 @@ export function Footer() {
             <a href="https://instagram.com/adelphiaisociety_" target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--primary)] transition-colors">
               <Instagram className="w-5 h-5" />
               <span className="sr-only">Instagram</span>
-            </a>
-            <a href="https://github.com/adelphiaisociety" target="_blank" rel="noopener noreferrer" className="hover:text-[color:var(--primary)] transition-colors">
-              <Github className="w-5 h-5" />
-              <span className="sr-only">GitHub</span>
             </a>
             <a href="mailto:aisociety@adelphi.edu" className="hover:text-[color:var(--primary)] transition-colors">
               <Mail className="w-5 h-5" />

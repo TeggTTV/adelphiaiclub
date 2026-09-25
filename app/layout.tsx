@@ -104,7 +104,7 @@ const organizationSchema = {
   name: SITE_NAME,
   url: SITE_URL,
   logo: `${SITE_URL}/TRANSPARENT%20LOGO.png`,
-  sameAs: ['https://instagram.com/adelphiaisociety_', 'https://github.com/adelphiaisociety'],
+  sameAs: ['https://instagram.com/adelphiaisociety_'],
   description: DEFAULT_DESCRIPTION,
   parentOrganization: {
     '@type': 'CollegeOrUniversity',

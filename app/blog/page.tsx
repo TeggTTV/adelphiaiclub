@@ -109,15 +109,6 @@ export default function BlogPage() {
 						/>
 					</div>
 				</div>
-
-				<div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-					<Link
-						href="/blog/submit"
-						className="inline-flex h-10 items-center rounded-full bg-[color:var(--primary)] px-5 text-sm font-bold text-[color:var(--primary-foreground)]"
-					>
-						Submit an Article
-					</Link>
-				</div>
 			</motion.div>
 
 			<div className="mx-auto max-w-7xl">
@@ -232,7 +223,7 @@ export default function BlogPage() {
 							No blog posts found
 						</h3>
 						<p className="mt-2 text-[color:var(--muted-foreground)]">
-							Try a different search or submit a new article.
+							Try a different search query.
 						</p>
 					</div>
 				)}

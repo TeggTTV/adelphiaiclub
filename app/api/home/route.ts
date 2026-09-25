@@ -48,7 +48,7 @@ export async function GET() {
 			role: m.role,
 			bio: m.bio,
 			imageUrl: m.imageUrl,
-			instagram: m.instagram,
+			handles: m.handles ?? [],
 		}));
 
 		// Map DB events to payload
@@ -59,17 +59,20 @@ export async function GET() {
 			date: event.date.toISOString(),
 			location: event.location,
 			link: event.link,
+			time: undefined as string | undefined,
+			type: undefined as string | undefined,
 		}));
 
 		// If DB has fewer than 3 upcoming events, supplement from static data
 		const nowTs = new Date().getTime();
 		const staticFuture = staticUpcomingEvents
 			.filter((e) => {
+				if (!e.date) return false;
 				const t =
 					e.date instanceof Date
 						? e.date.getTime()
 						: new Date(e.date).getTime();
-				return !Number.isNaN(t) && t >= nowTs;
+				return !Number.isNaN(t) && t >= nowTs - 24 * 60 * 60 * 1000;
 			})
 			.map((e) => ({
 				id: `static-${e.id}`,
@@ -77,8 +80,10 @@ export async function GET() {
 				description: e.description,
 				date: (e.date instanceof Date
 					? e.date
-					: new Date(e.date)
+					: new Date(e.date!)
 				).toISOString(),
+				time: e.time,
+				type: e.type,
 				location: e.location,
 				link: e.link,
 			}));

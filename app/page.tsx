@@ -2,10 +2,12 @@
 
 import * as React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion, useScroll, useTransform } from "motion/react"
-import { ArrowRight, Calendar, Code, Users, ChevronRight, FileCode2, User } from "lucide-react"
+import { ArrowRight, Calendar, Code, Users, ChevronRight, FileCode2, User, Globe, Instagram, Linkedin, MapPin } from "lucide-react"
 import { Section } from "@/components/Section"
 import { format } from "date-fns"
+import { upcomingEvents as initialEvents, eboardMembers as initialMembers } from "@/lib/data"
 
 function TypewriterEffect({ words }: { words: string[] }) {
   const [index, setIndex] = React.useState(0)
@@ -44,9 +46,17 @@ type HomeEvent = {
   id: string
   title: string
   description: string
-  date: string
+  date: string | null
+  time?: string
+  type?: string
   location: string
   link: string | null
+}
+
+type HomeMemberHandle = {
+  label: string
+  handle?: string
+  url: string
 }
 
 type HomeEboardMember = {
@@ -54,6 +64,8 @@ type HomeEboardMember = {
   name: string
   role: string
   bio: string | null
+  imageUrl?: string | null
+  handles?: HomeMemberHandle[]
 }
 
 type HomeProject = {
@@ -64,11 +76,42 @@ type HomeProject = {
   githubUrl: string | null
 }
 
+function formatEventDate(dateValue: string | null | undefined) {
+  if (!dateValue) return "Date TBD"
+  try {
+    const d = new Date(dateValue)
+    if (Number.isNaN(d.getTime())) return "Date TBD"
+    return format(d, "EEE, MMM d, yyyy")
+  } catch {
+    return "Date TBD"
+  }
+}
+
 export default function Home() {
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [0, 500], [0, 150])
-  const [events, setEvents] = React.useState<HomeEvent[]>([])
-  const [members, setMembers] = React.useState<HomeEboardMember[]>([])
+  const [events, setEvents] = React.useState<HomeEvent[]>(() =>
+    initialEvents.map((e) => ({
+      id: e.id,
+      title: e.title,
+      description: e.description,
+      date: e.date ? (e.date instanceof Date ? e.date.toISOString() : new Date(e.date).toISOString()) : null,
+      time: e.time,
+      type: e.type,
+      location: e.location,
+      link: e.link ?? null,
+    }))
+  )
+  const [members, setMembers] = React.useState<HomeEboardMember[]>(() =>
+    initialMembers.slice(0, 6).map((m) => ({
+      id: m.id,
+      name: m.name,
+      role: m.role,
+      bio: m.bio,
+      imageUrl: m.imageUrl,
+      handles: m.handles,
+    }))
+  )
   const [featuredProjects, setFeaturedProjects] = React.useState<HomeProject[]>([])
 
   React.useEffect(() => {
@@ -91,9 +134,15 @@ export default function Home() {
           return
         }
 
-        setEvents(payload.events ?? [])
-        setMembers(payload.members ?? [])
-        setFeaturedProjects(payload.projects ?? [])
+        if (payload.events && payload.events.length > 0) {
+          setEvents(payload.events)
+        }
+        if (payload.members && payload.members.length > 0) {
+          setMembers(payload.members)
+        }
+        if (payload.projects && payload.projects.length > 0) {
+          setFeaturedProjects(payload.projects)
+        }
       } catch (error) {
         console.error("Failed to load landing page data", error)
       }
@@ -108,13 +157,19 @@ export default function Home() {
 
   const upcomingEvents = React.useMemo(() => {
     const now = Date.now()
-    return events
+    const future = events
       .filter((e) => {
+        if (!e.date) return false
         const t = new Date(e.date).getTime()
-        return !Number.isNaN(t) && t >= now
+        return !Number.isNaN(t) && t >= now - 24 * 60 * 60 * 1000
       })
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(0, 3)
+      .sort((a, b) => new Date(a.date!).getTime() - new Date(b.date!).getTime())
+
+    if (future.length > 0) {
+      return future.slice(0, 3)
+    }
+
+    return events.slice(0, 3)
   }, [events])
 
   return (
@@ -260,7 +315,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">Upcoming Events</h2>
-              <p className="text-[color:var(--muted-foreground)]">Don&apos;t miss out on our latest workshops and meetups.</p>
+              <p className="text-[color:var(--muted-foreground)]">Workshops, discussions, and competitions happening this semester.</p>
             </div>
             <Link href="/events" className="inline-flex items-center gap-2 text-[color:var(--primary)] font-bold hover:underline underline-offset-4">
               View All Events <ArrowRight className="w-4 h-4" />
@@ -275,24 +330,36 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="glass glass-hover rounded-2xl p-6 flex flex-col h-full relative overflow-hidden group"
+                className="glass glass-hover rounded-3xl p-6 flex flex-col h-full relative overflow-hidden group border border-[color:var(--border)] hover:border-[color:var(--primary)]/50 transition-all duration-300"
               >
-                <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
                   <Calendar className="w-24 h-24 text-[color:var(--primary)]" />
                 </div>
-                <div className="text-sm font-bold text-[color:var(--primary)] mb-2">
-                  {format(new Date(event.date), "MMM d, yyyy • h:mm a")}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[color:var(--primary)]/10 text-[color:var(--primary)] border border-[color:var(--primary)]/20">
+                    {event.type || "Event"}
+                  </span>
+                  <span className="text-xs text-[color:var(--muted-foreground)] flex items-center gap-1 font-medium">
+                    <Calendar className="w-3.5 h-3.5 text-[color:var(--primary)]" />
+                    {formatEventDate(event.date)}
+                  </span>
                 </div>
-                <h3 className="text-xl font-bold mb-3 relative z-10">{event.title}</h3>
-                <p className="text-[color:var(--muted-foreground)] text-sm mb-6 flex-grow relative z-10">
+                <h3 className="text-xl font-bold mb-2 relative z-10 group-hover:text-[color:var(--primary)] transition-colors line-clamp-2">
+                  {event.title}
+                </h3>
+                <p className="text-[color:var(--muted-foreground)] text-sm mb-6 flex-grow relative z-10 line-clamp-3 leading-relaxed">
                   {event.description}
                 </p>
-                <div className="flex items-center justify-between mt-auto relative z-10">
-                  <span className="text-xs font-medium px-3 py-1 rounded-full bg-[color:var(--muted)]">
-                    {event.location}
-                  </span>
-                  <Link href={`/events`} className="p-2 rounded-full bg-[color:var(--primary)]/10 text-[color:var(--primary)] hover:bg-[color:var(--primary)] hover:text-[color:var(--primary-foreground)] transition-colors">
-                    <ArrowRight className="w-4 h-4" />
+                <div className="flex items-center justify-between mt-auto pt-4 border-t border-[color:var(--border)]/60 relative z-10">
+                  <div className="flex items-center gap-1.5 text-xs text-[color:var(--muted-foreground)] font-medium">
+                    <MapPin className="w-3.5 h-3.5 text-[color:var(--primary)]" />
+                    <span>{event.location}</span>
+                  </div>
+                  <Link
+                    href="/events"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[color:var(--primary)] hover:underline"
+                  >
+                    Details <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </motion.div>
@@ -306,64 +373,84 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* Stats Row */}
-      {/* <Section className="bg-[color:var(--primary)]/5 border-y border-[color:var(--primary)]/10 py-12">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[
-              { label: "Active Members", value: "150+" },
-              { label: "Events Held", value: "24" },
-              { label: "Projects Built", value: "12" },
-              { label: "Lines of Code", value: "100k+" },
-            ].map((stat, i) => (
-              <div key={i} className="flex flex-col gap-2">
-                <div className="text-4xl md:text-5xl font-black text-gradient">{stat.value}</div>
-                <div className="text-sm font-medium text-[color:var(--muted-foreground)] uppercase tracking-wider">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Section> */}
-
       {/* Featured E-Board */}
       <Section>
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Meet the Executive Board</h2>
             <p className="text-[color:var(--muted-foreground)] max-w-2xl mx-auto">
-              The dedicated team driving the vision and operations of the AI Society.
+              Student leaders organizing events, workshops, and projects for the club.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {members.map((member, i) => (
-              <motion.div
-                key={member.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass rounded-2xl p-6 text-center flex flex-col items-center gap-4 group hover:border-[color:var(--primary)] transition-colors"
-              >
-                <div className="w-24 h-24 rounded-full bg-[color:var(--muted)] flex items-center justify-center border-2 border-[color:var(--border)] group-hover:border-[color:var(--primary)] transition-colors">
-                  <User className="w-10 h-10 text-[color:var(--muted-foreground)] group-hover:text-[color:var(--primary)] transition-colors" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold">{member.name}</h3>
-                  <p className="text-sm font-medium text-[color:var(--primary)]">{member.role}</p>
-                  <p className="text-xs text-[color:var(--muted-foreground)]">{member.bio ?? ""}</p>
-                </div>
-              </motion.div>
-            ))}
+            {members.map((member, i) => {
+              const validHandles = (member.handles || []).filter(
+                (h) => h.url && h.url.trim() !== "" && h.url !== "#"
+              )
+
+              return (
+                <motion.div
+                  key={member.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="glass rounded-3xl p-6 text-center flex flex-col items-center group hover:border-[color:var(--primary)]/50 transition-all duration-300 border border-[color:var(--border)]"
+                >
+                  <span className="text-xs font-semibold px-3 py-1 rounded-full bg-[color:var(--primary)]/10 text-[color:var(--primary)] border border-[color:var(--primary)]/20 mb-3">
+                    {member.role}
+                  </span>
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-[color:var(--primary)] transition-colors">
+                    {member.name}
+                  </h3>
+                  <p className="text-xs text-[color:var(--muted-foreground)] line-clamp-3 leading-relaxed mb-4 flex-grow">
+                    {member.bio ?? ""}
+                  </p>
+                  {validHandles.length > 0 && (
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-auto pt-3 border-t border-[color:var(--border)]/50 w-full">
+                      {validHandles.map((h, hIdx) => {
+                        const isLi =
+                          h.label.toLowerCase().includes("linkedin") || h.url.includes("linkedin.com")
+                        const isIg =
+                          h.label.toLowerCase().includes("instagram") || h.url.includes("instagram.com")
+
+                        return (
+                          <a
+                            key={hIdx}
+                            href={h.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs text-[color:var(--muted-foreground)] hover:text-[color:var(--primary)] transition-colors px-2.5 py-1 rounded-lg bg-[color:var(--muted)]/60 hover:bg-[color:var(--muted)]"
+                          >
+                            {isLi ? (
+                              <Linkedin className="w-3.5 h-3.5 text-[#0a66c2]" />
+                            ) : isIg ? (
+                              <Instagram className="w-3.5 h-3.5 text-pink-500" />
+                            ) : (
+                              <Globe className="w-3.5 h-3.5" />
+                            )}
+                            <span>{h.handle || h.label}</span>
+                          </a>
+                        )
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+              )
+            })}
             {members.length === 0 && (
               <div className="sm:col-span-2 lg:col-span-3 glass rounded-2xl p-8 text-center text-[color:var(--muted-foreground)]">
                 Executive board members will appear here once they are added in the dashboard.
               </div>
             )}
           </div>
-          
+
           <div className="text-center mt-10">
-             <Link href="/eboard" className="inline-flex items-center gap-2 text-[color:var(--primary)] font-bold hover:underline underline-offset-4">
+            <Link
+              href="/eboard"
+              className="inline-flex items-center gap-2 text-[color:var(--primary)] font-bold hover:underline underline-offset-4"
+            >
               Get to know the team <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

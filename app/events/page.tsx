@@ -34,33 +34,54 @@ export default function EventsPage() {
       <Section className="bg-[color:var(--muted)]/30">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
           <div className="space-y-8">
-            {upcomingEvents.map((event, i) => (
-              <motion.div
-                key={event.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="glass rounded-3xl p-8 md:p-10 flex flex-col md:flex-row gap-8 relative overflow-hidden group"
-              >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[color:var(--primary)] rounded-full mix-blend-multiply filter blur-[128px] opacity-10 group-hover:opacity-20 transition-opacity" />
-                
-                <div className="md:w-1/3 flex flex-col justify-center border-r border-[color:var(--border)] pr-8">
-                  {event.type && (
-                    <div className="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--primary)] mb-4">
-                      {event.type}
+            {upcomingEvents.map((event, i) => {
+              const eventDate = event.date
+                ? event.date instanceof Date
+                  ? event.date
+                  : new Date(event.date)
+                : null
+              const hasValidDate = Boolean(eventDate && !isNaN(eventDate.getTime()))
+
+              return (
+                <motion.div
+                  key={event.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="glass rounded-3xl p-8 md:p-10 flex flex-col md:flex-row gap-8 relative overflow-hidden group"
+                >
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[color:var(--primary)] rounded-full mix-blend-multiply filter blur-[128px] opacity-10 group-hover:opacity-20 transition-opacity" />
+                  
+                  <div className="md:w-1/3 flex flex-col justify-center border-r border-[color:var(--border)] pr-8">
+                    {event.type && (
+                      <div className="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--primary)] mb-4">
+                        {event.type}
+                      </div>
+                    )}
+                    {hasValidDate && eventDate ? (
+                      <>
+                        <div className="text-5xl font-black text-[color:var(--primary)] mb-2">
+                          {format(eventDate, "dd")}
+                        </div>
+                        <div className="text-xl font-bold uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                          {format(eventDate, "MMM yyyy")}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-5xl font-black text-[color:var(--primary)] mb-2">
+                          TBD
+                        </div>
+                        <div className="text-xl font-bold uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                          Date TBD
+                        </div>
+                      </>
+                    )}
+                    <div className="text-sm font-medium mt-4 flex items-center gap-2">
+                      <Calendar className="w-4 h-4" /> {event.time || (hasValidDate && eventDate ? format(eventDate, "h:mm a") : "Schedule TBD")}
                     </div>
-                  )}
-                  <div className="text-5xl font-black text-[color:var(--primary)] mb-2">
-                    {format(event.date, "dd")}
                   </div>
-                  <div className="text-xl font-bold uppercase tracking-wider text-[color:var(--muted-foreground)]">
-                    {format(event.date, "MMM yyyy")}
-                  </div>
-                  <div className="text-sm font-medium mt-4 flex items-center gap-2">
-                    <Calendar className="w-4 h-4" /> {event.time || format(event.date, "h:mm a")}
-                  </div>
-                </div>
 
                 <div className="md:w-2/3 flex flex-col justify-center">
                   <h2 className="text-3xl font-bold mb-4">{event.title}</h2>
@@ -85,7 +106,8 @@ export default function EventsPage() {
                   </div>
                 </div>
               </motion.div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </Section>

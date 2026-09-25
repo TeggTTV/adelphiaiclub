@@ -1,47 +1,34 @@
 "use client"
 
 import * as React from "react"
-import Image from "next/image"
 import { motion, AnimatePresence } from "motion/react"
 import { Section } from "@/components/Section"
 import { eboardMembers } from "@/lib/data"
-import { ExternalLink, Globe, Instagram } from "lucide-react"
-
-function isInstagramUrl(url: string) {
-  return url.includes("instagram.com")
-}
-
-function getHandleFromUrl(url: string) {
-  try {
-    const parsed = new URL(url)
-    const path = parsed.pathname.replaceAll("/", "").trim()
-    return path ? `@${path}` : parsed.hostname
-  } catch {
-    return url
-  }
-}
+import { ExternalLink, Globe, Instagram, Linkedin } from "lucide-react"
 
 type MemberHandle = {
   label: string
-  handle: string
+  handle?: string
   url: string
 }
 
-type EboardMember = (typeof eboardMembers)[number] & {
-  handles?: MemberHandle[]
+type EboardMember = (typeof eboardMembers)[number]
+
+function getMemberHandles(member: EboardMember): MemberHandle[] {
+  if (!member.handles || !Array.isArray(member.handles)) return []
+  return member.handles.filter((link) => Boolean(link.url && link.url.trim() !== "" && link.url !== "#"))
 }
 
-function getMemberHandles(member: EboardMember) {
-  if (member.handles && member.handles.length > 0) return member.handles
-  if (!member.instagram) return []
-
-  return [
-    {
-      label: isInstagramUrl(member.instagram) ? "Instagram" : "Website",
-      handle: getHandleFromUrl(member.instagram),
-      url: member.instagram,
-    },
-  ]
+function renderHandleIcon(label: string, url: string) {
+  const l = label.toLowerCase()
+  const u = url.toLowerCase()
+  if (l.includes("linkedin") || u.includes("linkedin.com")) {
+    return <Linkedin className="w-4 h-4 shrink-0 text-[#0a66c2]" />
+  }
+  if (l.includes("instagram") || u.includes("instagram.com")) {
+    return <Instagram className="w-4 h-4 shrink-0 text-pink-500" />
+  }
+  return <Globe className="w-4 h-4 shrink-0 text-[color:var(--primary)]" />
 }
 
 export default function EboardPage() {
@@ -98,26 +85,15 @@ export default function EboardPage() {
                       key={member.id}
                       type="button"
                       onClick={() => setSelectedId(member.id)}
-                      className={`w-full cursor-pointer rounded-2xl border p-3 text-left transition-all duration-200 ${
+                      className={`w-full cursor-pointer rounded-2xl border p-4 text-left transition-all duration-200 ${
                         active
-                          ? "border-[color:var(--primary)] bg-[color:var(--primary)]/12"
+                          ? "border-[color:var(--primary)] bg-[color:var(--primary)]/12 shadow-sm"
                           : "border-[color:var(--border)] hover:border-[color:var(--primary)]/50 hover:bg-[color:var(--muted)]/60"
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="relative h-14 w-14 overflow-hidden rounded-xl border border-[color:var(--border)]">
-                          <Image
-                            src={member.imageUrl ?? "/images/eboard/cindy.svg"}
-                            alt={`${member.name} profile photo`}
-                            fill
-                            sizes="56px"
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-bold leading-tight truncate">{member.name}</div>
-                          <div className="text-xs uppercase tracking-wider text-[color:var(--primary)] truncate">{member.role}</div>
-                        </div>
+                      <div className="font-bold leading-tight truncate">{member.name}</div>
+                      <div className="text-xs uppercase tracking-wider text-[color:var(--primary)] truncate mt-1">
+                        {member.role}
                       </div>
                     </button>
                   )
@@ -133,64 +109,62 @@ export default function EboardPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.25 }}
-                  className="glass rounded-3xl overflow-hidden"
+                  className="glass rounded-3xl p-8 md:p-12 relative overflow-hidden"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-[320px_1fr] min-h-[420px]">
-                    <div className="relative min-h-[320px] md:min-h-full bg-[color:var(--muted)]/40">
-                      <Image
-                        src={selectedMember.imageUrl ?? "/images/eboard/cindy.svg"}
-                        alt={`${selectedMember.name} portrait`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 320px"
-                        className="object-cover"
-                        priority
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4 rounded-xl bg-black/45 backdrop-blur-sm border border-white/10 px-4 py-3">
-                        <p className="text-xs uppercase tracking-wider text-indigo-200">Current Role</p>
-                        <p className="font-bold text-white">{selectedMember.role}</p>
-                      </div>
+                  <div className="flex flex-col">
+                    <div className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[color:var(--primary)]/10 text-[color:var(--primary)] border border-[color:var(--primary)]/20 w-fit mb-3">
+                      {selectedMember.role}
                     </div>
+                    <h3 className="text-3xl md:text-5xl font-black tracking-tight mb-4">{selectedMember.name}</h3>
+                    <p className="text-[color:var(--muted-foreground)] leading-relaxed text-base md:text-lg mb-8 max-w-3xl">
+                      {selectedMember.bio}
+                    </p>
 
-                    <div className="p-6 md:p-8 flex flex-col">
-                      <h3 className="text-3xl md:text-4xl font-black tracking-tight mb-3">{selectedMember.name}</h3>
-                      <p className="text-[color:var(--muted-foreground)] leading-relaxed text-base md:text-lg mb-8">
-                        {selectedMember.bio}
-                      </p>
+                    <div>
+                      <h4 className="text-sm font-bold uppercase tracking-widest text-[color:var(--primary)] mb-3">
+                        Profiles &amp; Links
+                      </h4>
 
-                      <div>
-                        <h4 className="text-sm font-bold uppercase tracking-widest text-[color:var(--primary)] mb-3">
-                          Handles
-                        </h4>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {getMemberHandles(selectedMember).map((link) => (
-                            <a
-                              key={`${selectedMember.id}-${link.url}`}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="cursor-pointer rounded-xl border border-[color:var(--border)] bg-[color:var(--muted)]/45 px-4 py-3 hover:border-[color:var(--primary)]/70 hover:bg-[color:var(--primary)]/10 transition-colors"
-                            >
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  {isInstagramUrl(link.url) ? (
-                                    <Instagram className="w-4 h-4 shrink-0" />
-                                  ) : (
-                                    <Globe className="w-4 h-4 shrink-0" />
-                                  )}
-                                  <span className="font-semibold text-sm truncate">{link.label}</span>
-                                </div>
-                                <ExternalLink className="w-4 h-4 opacity-70 shrink-0" />
+                        {(() => {
+                          const memberHandles = getMemberHandles(selectedMember)
+                          if (memberHandles.length === 0) {
+                            return (
+                              <div className="rounded-2xl border border-dashed border-[color:var(--border)] p-5 text-sm text-[color:var(--muted-foreground)] bg-[color:var(--muted)]/20">
+                                Professional profiles and social links are being collected.
                               </div>
-                              <p className="text-xs text-[color:var(--muted-foreground)] mt-1 truncate">{link.handle}</p>
-                            </a>
-                          ))}
-                        </div>
+                            )
+                          }
+
+                          return (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {memberHandles.map((link) => (
+                                <a
+                                  key={`${selectedMember.id}-${link.url}-${link.label}`}
+                                  href={link.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="cursor-pointer rounded-2xl border border-[color:var(--border)] bg-[color:var(--muted)]/45 px-4 py-3 hover:border-[color:var(--primary)]/70 hover:bg-[color:var(--primary)]/10 transition-colors group/link"
+                                >
+                                  <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      {renderHandleIcon(link.label, link.url)}
+                                      <span className="font-semibold text-sm truncate">{link.label}</span>
+                                    </div>
+                                    <ExternalLink className="w-4 h-4 opacity-70 group-hover/link:opacity-100 shrink-0 transition-opacity" />
+                                  </div>
+                                  {link.handle ? (
+                                    <p className="text-xs text-[color:var(--muted-foreground)] mt-1 truncate font-mono">
+                                      {link.handle}
+                                    </p>
+                                  ) : null}
+                                </a>
+                              ))}
+                            </div>
+                          )
+                        })()}
                       </div>
                     </div>
-                  </div>
-                </motion.article>
+                  </motion.article>
               )}
             </AnimatePresence>
           </div>

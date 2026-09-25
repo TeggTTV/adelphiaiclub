@@ -1,27 +1,46 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // E-Board Members
 //
-// HOW TO ADD A REAL PROFILE PHOTO:
-//   1. Drop the photo in /public/images/eboard/ — recommended: JPG or WebP,
-//      at least 800×1000px, portrait orientation (4:5 ratio works great).
-//      Name it to match the current imageUrl path, e.g. "santiago-rodriguez.jpg"
-//   2. Update imageUrl to the new filename:
-//        imageUrl: '/images/eboard/santiago-rodriguez.jpg'
-//   3. Set photoReady: true — this hides the "Photo Coming Soon" badge.
-//
-// Until a real photo is added, the SVG placeholder in /public/images/eboard/
-// will be shown automatically (initials + gradient, unique color per person).
+// HOW TO ADD A LINKEDIN PROFILE OR HANDLE:
+//   Each member below has a `handles` array.
+//   To add a LinkedIn profile, fill in the handle and url:
+//     {
+//       label: 'LinkedIn',
+//       handle: 'username',
+//       url: 'https://www.linkedin.com/in/username',
+//     }
+//   Leave `url: ''` empty if not yet provided. Empty links are automatically hidden.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const eboardMembers = [
+export type MemberHandle = {
+	label: string;
+	handle?: string;
+	url: string;
+};
+
+export type EboardMember = {
+	id: string;
+	name: string;
+	role: string;
+	bio: string;
+	imageUrl: string;
+	handles: MemberHandle[];
+	order: number;
+};
+
+export const eboardMembers: EboardMember[] = [
 	{
 		id: '1',
 		name: 'Santiago Rodriguez',
 		role: 'President',
-		bio: 'Artificial Intelligence major passionate about exploring emerging technologies to spark new ideas, unlock creativity, and drive meaningful progress.',
+		bio: 'Artificial Intelligence major passionate about exploring emerging technologies to spark new ideas, expand creativity, and drive meaningful progress.',
 		imageUrl: '/images/eboard/santiago-rodriguez.svg',
-		instagram: 'https://instagram.com/_itssantiagox',
 		handles: [
+			{
+				label: 'LinkedIn',
+				handle: 'santiagorodriguezai',
+				url: 'https://www.linkedin.com/in/santiagorodriguezai/',
+			},
 			{
 				label: 'Instagram',
 				handle: '@_itssantiagox',
@@ -29,11 +48,8 @@ export const eboardMembers = [
 			},
 			{
 				label: 'Portfolio',
+				handle: 'iamsantiago.com',
 				url: 'https://iamsantiago.com',
-			},
-			{
-				label: 'GitHub',
-				url: '',
 			},
 		],
 		order: 1,
@@ -44,8 +60,12 @@ export const eboardMembers = [
 		role: 'Vice President',
 		bio: 'Nursing major bringing healthcare perspective to AI applications. Focused on bridging the gap between medical care and artificial intelligence.',
 		imageUrl: '/images/eboard/doryan-bendezu.svg',
-		instagram: 'https://instagram.com/doctordbd',
 		handles: [
+			{
+				label: 'LinkedIn',
+				handle: 'doryan-bendezu-chauca',
+				url: 'https://www.linkedin.com/in/doryan-bendezu-chauca-935ab62ba/',
+			},
 			{
 				label: 'Instagram',
 				handle: '@doctordbd',
@@ -60,14 +80,20 @@ export const eboardMembers = [
 		role: 'Senior Software Engineer',
 		bio: 'Computer Science major with 7+ years of coding experience, specializing in TypeScript web development and backend systems.',
 		imageUrl: '/images/eboard/joseph-jazwinski.svg',
-		instagram: 'https://instagram.com/teggundrut',
 		handles: [
 			{
+				label: 'LinkedIn',
+				handle: 'joeyjedu',
+				url: 'https://www.linkedin.com/in/joeyjedu/',
+			},
+			{
 				label: 'Portfolio',
+				handle: 'joeyjazwinski.com',
 				url: 'https://joeyjazwinski.com',
 			},
 			{
 				label: 'GitHub',
+				handle: 'TeggTTV',
 				url: 'https://github.com/TeggTTV',
 			},
 			{
@@ -84,12 +110,11 @@ export const eboardMembers = [
 		role: 'Treasurer',
 		bio: 'Accounting major managing club finances and budgeting. Exploring the intersection of AI and financial technology.',
 		imageUrl: '/images/eboard/amy-mathew.svg',
-		instagram: '',
 		handles: [
 			{
-				label: 'Instagram',
-				handle: '@',
-				url: 'https://instagram.com/',
+				label: 'LinkedIn',
+				handle: '',
+				url: '',
 			},
 		],
 		order: 4,
@@ -100,8 +125,12 @@ export const eboardMembers = [
 		role: 'Secretary',
 		bio: 'Computer Science major dedicated to supporting the club and advancing AI initiatives.',
 		imageUrl: '/images/eboard/rian-fernando.svg',
-		instagram: 'https://instagram.com/rian._.f',
 		handles: [
+			{
+				label: 'LinkedIn',
+				handle: 'rian-fernando',
+				url: 'https://www.linkedin.com/in/rian-fernando/',
+			},
 			{
 				label: 'Instagram',
 				handle: '@rian._.f',
@@ -116,8 +145,12 @@ export const eboardMembers = [
 		role: 'Social Media/Creative Director',
 		bio: 'Leads our creative and social media efforts, bringing fresh ideas and vibrant energy to the club.',
 		imageUrl: '/images/eboard/julia-abbaticchio.svg',
-		instagram: '',
 		handles: [
+			{
+				label: 'LinkedIn',
+				handle: 'juliaabbaticchio',
+				url: 'https://www.linkedin.com/in/juliaabbaticchio/',
+			},
 			{
 				label: 'Instagram',
 				handle: '@julia.abbs.06',
@@ -128,40 +161,148 @@ export const eboardMembers = [
 	},
 ];
 
-export const upcomingEvents = [
+export type ClubEvent = {
+	id: string;
+	title: string;
+	description: string;
+	date: Date | null;
+	time?: string;
+	type?: string;
+	location: string;
+	link?: string;
+	imageUrl?: string | null;
+};
+
+export const upcomingEvents: ClubEvent[] = [
 	{
 		id: '1',
 		title: 'AI Debate',
 		description:
-			'Put a controversial or interesting topic on the board and start the conversation. Others will jump in. Light snacks like cookies and water. Week of April 13th-17th, replaces regular meeting that week.',
-		date: new Date('2026-04-15T13:30:00'),
-		time: '1:30pm - 2:30pm',
-		type: 'Event',
-		location: 'TBD',
+			'An interactive debate where students will explore different perspectives on current AI-related topics. Participants will be divided into teams, given positions to defend, and challenged to develop arguments and respond to opposing viewpoints. The goal is to encourage critical thinking and discussion around the broader impact of AI.',
+		date: new Date('2026-09-14T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Debate',
+		location: 'Adelphi University',
 		link: '#',
 		imageUrl: null,
 	},
 	{
 		id: '2',
-		title: 'AlphaFold Workshop',
+		title: 'AI vs. Human',
 		description:
-			'Hands-on workshop exploring AlphaFold and its impact on protein structure prediction. Open to all skill levels.',
-		date: new Date('2026-04-15T18:00:00'),
-		time: '6:00pm',
-		type: 'Workshop',
-		location: 'UC 213/214',
+			'An interactive competition where students will complete a series of creative and problem-solving challenges without using AI, while the AI Society secretly generates its own responses using the same instructions and time limits. The human and AI responses will then be compared, giving participants a fun way to explore where humans and AI perform differently.',
+		date: new Date('2026-09-21T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Competition',
+		location: 'Adelphi University',
 		link: '#',
 		imageUrl: null,
 	},
 	{
 		id: '3',
+		title: 'Build Your Own AI App',
+		description:
+			'A hands-on building session where students will use Google AI Studio to create their own AI-powered applications, with no prior coding experience required. We will demonstrate how AI can be used to build software, provide starter prompts and ideas, and have AI Society members available to help participants develop and improve their projects. Students will have the opportunity to showcase what they build at the end of the session.',
+		date: new Date('2026-09-28T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Hands-on Workshop',
+		location: 'Adelphi University',
+		link: '#',
+		imageUrl: null,
+	},
+	{
+		id: '4',
+		title: 'From Student to Startup Founder: Guest Speaker Prayag',
+		description:
+			'Guest Speaker: Prayag, an Adelphi CS graduate and startup founder, will share his journey from being a student to working at an AI startup and eventually leaving his job to pursue his own company full-time. His product has grown to more than 1,000 users, and he will discuss how he identified a problem, built and tested his product, found his first users, and grew the startup. The event will also include a live look at his startup and an interactive Q&A.',
+		date: new Date('2026-10-05T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Guest Speaker',
+		location: 'Adelphi University',
+		link: '#',
+		imageUrl: null,
+	},
+	{
+		id: '5',
+		title: 'The AI Game Show',
+		description:
+			'An interactive AI-themed game show inspired by Jeopardy, where teams will compete across categories including AI history, major AI companies, AI movies, neural networks, prompt engineering, unusual AI facts, and the future of AI. Questions will use a variety of formats, including multiple choice, rapid-fire questions, visual identification, and other interactive challenges. The event will be presented through a custom game-show interface to make it feel like a competition rather than a traditional presentation.',
+		date: new Date('2026-10-19T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Interactive',
+		location: 'Adelphi University',
+		link: '#',
+		imageUrl: null,
+	},
+	{
+		id: '6',
+		title: 'AI United Nations',
+		description:
+			'An interactive simulation where each team represents a different country with its own economic situation, technological capabilities, priorities, and political interests. Teams will negotiate a proposed global framework for AI while dealing with issues such as AI access, misinformation, labor displacement, surveillance, algorithmic discrimination, and control of advanced AI. Unexpected developments may be introduced throughout the simulation, forcing teams to adapt their strategies and negotiate with other countries.',
+		date: new Date('2026-10-26T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Simulation',
+		location: 'Adelphi University',
+		link: '#',
+		imageUrl: null,
+	},
+	{
+		id: '7',
+		title: 'Create Your Own Professional Website Workshop',
+		description:
+			"A hands-on workshop where students will learn how to create and deploy their own professional personal website using AI, even without advanced coding experience. We will demonstrate how a website can showcase a student's education, projects, research, experience, skills, and résumé, then walk through using AI to build and customize the site. Students will work on their own websites with guidance from the AI Society and learn how to publish them using GitHub and Vercel. A representative from the Business School may also be invited to provide additional perspective on professional branding and career development.",
+		date: new Date('2026-11-02T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Workshop',
+		location: 'Adelphi University',
+		link: '#',
+		imageUrl: null,
+	},
+	{
+		id: '8',
+		title: 'AI Survival Guide',
+		description:
+			'An interactive workshop focused on helping students use AI more effectively for college. We will introduce a selection of useful AI tools and explain what each is best suited for rather than simply listing different platforms. Students will then apply what they learn through practical challenges, such as using a course syllabus to create a study plan, research strategy, or presentation workflow. The goal is for students to leave with practical strategies they can immediately use in their classes.',
+		date: new Date('2026-11-09T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Workshop',
+		location: 'Adelphi University',
+		link: '#',
+		imageUrl: null,
+	},
+	{
+		id: '9',
 		title: 'AI Hackathon',
 		description:
-			'First AI coding hackathon. Use an AI-powered IDE, multiple winners, food (pizza), and prizes (Amazon gift card, AI subscription). Bring your own device or borrow a Chromebook. Topic revealed at the start.',
-		date: new Date('2026-04-29T17:45:00'),
-		time: '5:45pm - 6:30pm',
-		type: 'Competition',
-		location: 'UC or Innovation Center',
+			'A full-day flagship AI Society event where students will have approximately eight hours to turn an idea into a working AI-powered project. The hackathon will be open to both beginners and experienced students, with participants able to compete individually or in teams of 2-4. Participants will have access to food, drinks, starter templates, useful prompts, and AI Society members who can provide guidance throughout the event. After the submission deadline, judges will select a group of finalists to present their projects, followed by the announcement of the winners and prizes for the top five projects. Date and exact schedule TBD.',
+		date: null,
+		time: 'Full Day (8 Hours, Schedule TBD)',
+		type: 'Flagship Hackathon',
+		location: 'Adelphi University',
+		link: '#',
+		imageUrl: null,
+	},
+	{
+		id: '10',
+		title: 'Applying Machine Learning to the Housing Market',
+		description:
+			"A beginner-friendly hands-on workshop where students will use a real-world housing dataset to explore how machine learning can be used to predict property prices. Participants will start with a pre-built baseline model and then experiment with features, model parameters, and other approaches to see how their changes affect performance. The workshop will also explore which characteristics of a property, such as size, location, and number of rooms, have the greatest influence on the model's predictions.",
+		date: new Date('2026-11-30T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Workshop',
+		location: 'Adelphi University',
+		link: '#',
+		imageUrl: null,
+	},
+	{
+		id: '11',
+		title: 'AI Society End-of-Semester Party',
+		description:
+			"A relaxed final event celebrating the AI Society's activities and accomplishments throughout the semester. The event will include food, music, socializing, and a short recap featuring photos, projects, events, and memorable moments from the semester. Members will also have the opportunity to share ideas for future events, speakers, and activities they would like to see from the society next semester.",
+		date: new Date('2026-12-07T13:00:00'),
+		time: '1:00pm - 2:00pm',
+		type: 'Social Celebration',
+		location: 'Adelphi University',
 		link: '#',
 		imageUrl: null,
 	},
@@ -197,7 +338,7 @@ export const projects: Project[] = [
 		status: 'In Progress',
 		difficulty: 'Advanced',
 		featured: true,
-		githubUrl: 'https://github.com/adelphiaisociety',
+		githubUrl: '',
 		liveUrl: '#',
 		imageUrl: null,
 		lastUpdated: '2026-03-18',
@@ -215,7 +356,7 @@ export const projects: Project[] = [
 		status: 'Launched',
 		difficulty: 'Intermediate',
 		featured: true,
-		githubUrl: 'https://github.com/adelphiaisociety',
+		githubUrl: '',
 		liveUrl: '#',
 		imageUrl: null,
 		lastUpdated: '2026-02-26',
@@ -233,7 +374,7 @@ export const projects: Project[] = [
 		status: 'In Progress',
 		difficulty: 'Intermediate',
 		featured: true,
-		githubUrl: 'https://github.com/adelphiaisociety',
+		githubUrl: '',
 		liveUrl: '#',
 		imageUrl: null,
 		lastUpdated: '2026-03-22',
@@ -251,7 +392,7 @@ export const projects: Project[] = [
 		status: 'Research',
 		difficulty: 'Beginner',
 		featured: false,
-		githubUrl: 'https://github.com/adelphiaisociety',
+		githubUrl: '',
 		liveUrl: '#',
 		imageUrl: null,
 		lastUpdated: '2026-03-10',
@@ -269,7 +410,7 @@ export const projects: Project[] = [
 		status: 'Planning',
 		difficulty: 'Beginner',
 		featured: false,
-		githubUrl: 'https://github.com/adelphiaisociety',
+		githubUrl: '',
 		liveUrl: '#',
 		imageUrl: null,
 		lastUpdated: '2026-03-25',
@@ -287,7 +428,7 @@ export const projects: Project[] = [
 		status: 'Launched',
 		difficulty: 'Advanced',
 		featured: true,
-		githubUrl: 'https://github.com/adelphiaisociety',
+		githubUrl: '',
 		liveUrl: '#',
 		imageUrl: null,
 		lastUpdated: '2026-03-04',
